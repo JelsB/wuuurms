@@ -17,6 +17,7 @@ Testing
    1. android
 
 # Platform configuration updates
+See docs for all platforms: https://docs.amplify.aws/start/getting-started/setup/q/integration/flutter/#platform-setup
 ## Android
 Amplify requires a minimum of API level 24 (Android 7.0), Gradle 7 and Kotlin > 1.7 when targeting Android.
 
