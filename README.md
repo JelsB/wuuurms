@@ -15,6 +15,17 @@ Testing
    2. run `flutter pub get`
 2. Update platform configurations
    1. android
+3. `amplify init`
+   1. Select CloudFormation
+   2. Select profile with `AdministratorAccess-Amplify` policy permission
+   3. If you can an error `You have reached the Amplify App limit for this account and region`. Delete all amplify apps and try again.
+   4. Deploys a CloudFormation stack
+      1.  2 IAM roles
+      2.  S3 bucket
+   5. Deploys an Amplify application
+   6. Creates `amplify/` folder
+      1. `team-provider-info.json` contains info about CloudFormation stacks and its resources
+      2. a bunch of files/folders that should not be version controlled (see `.gitignore`)
 
 # Platform configuration updates
 See docs for all platforms: https://docs.amplify.aws/start/getting-started/setup/q/integration/flutter/#platform-setup
