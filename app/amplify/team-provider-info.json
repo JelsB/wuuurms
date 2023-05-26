@@ -10,6 +10,11 @@
       "StackName": "amplify-hex-dev-215212",
       "StackId": "arn:aws:cloudformation:eu-central-1:016957204234:stack/amplify-hex-dev-215212/a4f547d0-fb35-11ed-9661-02f3ac451056",
       "AmplifyAppId": "d1x3fz0av7c98g"
+    },
+    "categories": {
+      "auth": {
+        "hex5dfb724f": {}
+      }
     }
   }
 }
