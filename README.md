@@ -26,7 +26,16 @@ Testing
    6. Creates `amplify/` folder
       1. `team-provider-info.json` contains info about CloudFormation stacks and its resources
       2. a bunch of files/folders that should not be version controlled (see `.gitignore`)
-
+   7. `amplify add api`
+      1. select GraphQL
+      2. Select AWS Incognito for authorisation
+         1. Use default configuration
+         2. Login with Username
+      3. This updates `amplify/backend/backend-config.json` file with login configuration
+      4. This creates `amplifybackend/auth/<app_name_suffix` folder with `cli-inputs.json` file which contains Congnito configuration.
+      5. Enter `N` when prompted to Configure additional auth types
+      6. Select Continue
+      7. 
 # Platform configuration updates
 See docs for all platforms: https://docs.amplify.aws/start/getting-started/setup/q/integration/flutter/#platform-setup
 ## Android
