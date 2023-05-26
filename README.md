@@ -36,6 +36,23 @@ Testing
       5. Enter `N` when prompted to Configure additional auth types
       6. Select Continue
       7. Add blank schema
+      8. Select Y to edit schema
+         ```
+         type BudgetEntry @model @auth(rules: [{ allow: owner }]) {
+         id: ID!
+         title: String!
+         description: String
+         amount: Float!
+         }
+         ```
+      9. `amplify push`
+         1.  Updates existing stack with lambda function, role, and custom resource + 2 nested stacks
+         2.  First nested stack: auth/cognito related resources
+         3.  Second nested stack: AppSync GraphQL api, schema and Datasource + 2 more nested stacks
+             1.  First nested stack: AppSync resolvers and function configurations
+             2.  Second nested stack: empty
+         4.  It returns your GraphQL endpoint and transform version
+
 # Platform configuration updates
 See docs for all platforms: https://docs.amplify.aws/start/getting-started/setup/q/integration/flutter/#platform-setup
 ## Android
