@@ -35,7 +35,7 @@ Testing
       4. This creates `amplifybackend/auth/<app_name_suffix` folder with `cli-inputs.json` file which contains Congnito configuration.
       5. Enter `N` when prompted to Configure additional auth types
       6. Select Continue
-      7. 
+      7. Add blank schema
 # Platform configuration updates
 See docs for all platforms: https://docs.amplify.aws/start/getting-started/setup/q/integration/flutter/#platform-setup
 ## Android
