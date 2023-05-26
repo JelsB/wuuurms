@@ -52,6 +52,7 @@ Testing
              1.  First nested stack: AppSync resolvers and function configurations
              2.  Second nested stack: empty
          4.  It returns your GraphQL endpoint and transform version
+      10. `amplify codegen models` creates Dart model files based on GraphQL schema  
 
 # Platform configuration updates
 See docs for all platforms: https://docs.amplify.aws/start/getting-started/setup/q/integration/flutter/#platform-setup
