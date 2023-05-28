@@ -104,7 +104,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _navigateToBudgetEntry({BudgetEntry? budgetEntry}) async {
-    // To be filled in
+    context.pushNamed('manage', extra: budgetEntry); // manage is name of route
+    //which points to /manage-budget-entry
   }
 
   double _calculateTotalBudget(List<BudgetEntry?> items) {
