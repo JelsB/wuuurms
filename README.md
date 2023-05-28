@@ -53,6 +53,9 @@ Testing
              2.  Second nested stack: empty
          4.  It returns your GraphQL endpoint and transform version
       10. `amplify codegen models` creates Dart model files based on GraphQL schema  
+      11. Add `go_router` package
+      12. run `flutter pub get` or VScode does this automatically on saving the `pubspec.yaml` file when Flutter extension is installed.
+      13. Replace `main.dart` file with tutorial example 
 
 # Platform configuration updates
 See docs for all platforms: https://docs.amplify.aws/start/getting-started/setup/q/integration/flutter/#platform-setup
