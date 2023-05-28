@@ -85,6 +85,10 @@ Testing
 9.  Show list of budgets on start-up and update when creating new one
     1.  add methos to query the items
     2.  call this method on start-up and after creating new budget
+10. Delete items
+    1.  add delete GraphQL mutation method
+    2.  when swiping away an item, call delete item method
+    3.  refresh list after doing that
 # Platform configuration updates
 See docs for all platforms: https://docs.amplify.aws/start/getting-started/setup/q/integration/flutter/#platform-setup
 ## Android
