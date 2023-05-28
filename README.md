@@ -70,7 +70,18 @@ Testing
         6. Out of the box, it sends verification email with code
         7. Enter received code
         8. You now enter the app's home screen
-
+ 9. Add new screen to enter budgets
+    1.  Add new class
+    2.  Add new route that instantiates this class screen
+    3.  Go to this page when pressing `+` button
+    4.  `flutter run`
+    5.  Press `+` button after login
+    6.  Enter budget details
+        1.  title: `Test1`
+        2.  description:  `some tst`
+        3.  amount: `2`
+    7.  Submit form
+    8.  We are returned to home screen but don't see our newly created budget. It did, however, get created in DynamoDB![item in DynamoDB table with details of newly created budget](images/DDB_first_budget.png)
 # Platform configuration updates
 See docs for all platforms: https://docs.amplify.aws/start/getting-started/setup/q/integration/flutter/#platform-setup
 ## Android
