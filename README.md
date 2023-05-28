@@ -53,9 +53,23 @@ Testing
              2.  Second nested stack: empty
          4.  It returns your GraphQL endpoint and transform version
       10. `amplify codegen models` creates Dart model files based on GraphQL schema  
-      11. Add `go_router` package
-      12. run `flutter pub get` or VScode does this automatically on saving the `pubspec.yaml` file when Flutter extension is installed.
-      13. Replace `main.dart` file with tutorial example 
+4.  Add `go_router` package
+5.  run `flutter pub get` or VScode does this automatically on saving the `pubspec.yaml` file when Flutter extension is installed.
+6.  Replace `main.dart` file with tutorial example
+7.  Connect with Amplify auth and api backend services
+    1.  Add `auth` (Cognitor) and `api` (GraphQL)
+    2.  Replace some code in `main.dart` to configure amplify resources on start-up
+8.  run `flutter run`
+    1.  Login screen appears before app can be used![Login screen at start-up of app](images/login.png)
+    2.  Creating real users with real emails/verification/password etc works out of the box due to Cognito!
+        1. Create user `Jels` with fake email address
+        2. Create second user `Jels` with real email address
+        3. This fails because we choose that usernames have to be unique. The previous user is already stored in Cognito![User Jels with fake email in Cognito](images/cognito_user_jels_fake_email.png)
+        4. Manually delete fake user in Cognito
+        5. Again create user `Jels` with real email address
+        6. Out of the box, it sends verification email with code
+        7. Enter received code
+        8. You now enter the app's home screen
 
 # Platform configuration updates
 See docs for all platforms: https://docs.amplify.aws/start/getting-started/setup/q/integration/flutter/#platform-setup
