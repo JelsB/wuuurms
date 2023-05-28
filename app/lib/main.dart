@@ -93,10 +93,26 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _refreshBudgetEntries();
   }
 
   Future<void> _refreshBudgetEntries() async {
-    // To be filled in
+    safePrint('Refreshing budgets');
+    try {
+      final request = ModelQueries.list(BudgetEntry.classType);
+      final response = await Amplify.API.query(request: request).response;
+
+      final todos = response.data?.items;
+      if (response.hasErrors) {
+        safePrint('errors: ${response.errors}');
+        return;
+      }
+      setState(() {
+        _budgetEntries = todos!.whereType<BudgetEntry>().toList();
+      });
+    } on ApiException catch (e) {
+      safePrint('Query failed: $e');
+    }
   }
 
   Future<void> _deleteBudgetEntry(BudgetEntry budgetEntry) async {
@@ -104,8 +120,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _navigateToBudgetEntry({BudgetEntry? budgetEntry}) async {
-    context.pushNamed('manage', extra: budgetEntry); // manage is name of route
+    await context.pushNamed('manage',
+        extra: budgetEntry); // manage is name of route
     //which points to /manage-budget-entry
+
+    // Refresh the entries when returning from the
+    // budget entry screen.
+    await _refreshBudgetEntries();
   }
 
   double _calculateTotalBudget(List<BudgetEntry?> items) {

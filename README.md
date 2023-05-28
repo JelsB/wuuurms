@@ -82,6 +82,9 @@ Testing
         3.  amount: `2`
     7.  Submit form
     8.  We are returned to home screen but don't see our newly created budget. It did, however, get created in DynamoDB![item in DynamoDB table with details of newly created budget](images/DDB_first_budget.png)
+9.  Show list of budgets on start-up and update when creating new one
+    1.  add methos to query the items
+    2.  call this method on start-up and after creating new budget
 # Platform configuration updates
 See docs for all platforms: https://docs.amplify.aws/start/getting-started/setup/q/integration/flutter/#platform-setup
 ## Android
