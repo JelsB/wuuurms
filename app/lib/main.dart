@@ -45,6 +45,13 @@ class MyApp extends StatelessWidget {
         path: '/',
         builder: (context, state) => const HomeScreen(),
       ),
+      GoRoute(
+        path: '/manage-budget-entry',
+        name: 'manage',
+        builder: (context, state) => ManageBudgetEntryScreen(
+          budgetEntry: state.extra as BudgetEntry?,
+        ),
+      ),
     ],
   );
 
