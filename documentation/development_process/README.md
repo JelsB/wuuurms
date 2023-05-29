@@ -147,4 +147,6 @@ First idea was to call the authenticator after going to the login page but the `
 
 1. We add another route `/login` which requires authentication. Other current routes are public.
 > **What have I learnt?** \
-> Routes don't update with *hot reload*. You need to restart the application.
+> - Routes don't update with *hot reload*. You need to restart the application.
+> - `Authenticator` component does not work on Desktop
+> - Specific screens for authentication doens't work with `Authenticator`'s `builder` config 

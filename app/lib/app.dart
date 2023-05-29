@@ -36,9 +36,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Authenticator(
       child: MaterialApp.router(
+        // routeInformationParser: router.routeInformationParser,
+        // routerDelegate: router.routerDelegate,
         routerConfig: router,
-        debugShowCheckedModeBanner: false,
-        builder: Authenticator.builder(),
+        // debugShowCheckedModeBanner: false,
+        // builder: Authenticator.builder(), //NOTE: does not work with partial authenticated screens
       ),
     );
   }
