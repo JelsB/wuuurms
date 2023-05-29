@@ -1,6 +1,8 @@
 import 'package:amplify_api/amplify_api.dart';
+import 'package:amplify_authenticator/amplify_authenticator.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:app/models/BudgetEntry.dart';
+import 'package:app/screens/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -64,6 +66,10 @@ class _HomeScreenState extends State<HomeScreen> {
     return totalAmount;
   }
 
+  Future<void> _navigateToLogin() async {
+    await context.pushNamed('login');
+  }
+
   Widget _buildRow({
     required String title,
     required String description,
@@ -106,7 +112,18 @@ class _HomeScreenState extends State<HomeScreen> {
         child: const Icon(Icons.add),
       ),
       appBar: AppBar(
-        title: const Text('Budget Tracker'),
+        title: const Text('HEX copy'),
+        actions: [
+          TextButton(
+            onPressed: _navigateToLogin,
+            child: const Text(
+              'Login',
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
       ),
       body: Center(
         child: Padding(
