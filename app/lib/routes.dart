@@ -1,6 +1,7 @@
 // GoRouter configuration
 import 'package:amplify_authenticator/amplify_authenticator.dart';
 import 'package:app/models/BudgetEntry.dart';
+import 'package:app/screens/boardgames.dart';
 import 'package:app/screens/budgets.dart';
 import 'package:app/screens/home.dart';
 import 'package:app/screens/manage_budget_entry.dart';
@@ -27,5 +28,10 @@ final router = GoRouter(routes: [
       path: '/login',
       name: 'login',
       builder: (context, state) =>
-          const AuthenticatedView(child: ProfileScreen()))
+          const AuthenticatedView(child: ProfileScreen())),
+  GoRoute(
+    path: '/boardgames',
+    name: 'boardgames',
+    builder: (context, state) => const BoardGamesScreen(),
+  )
 ]);

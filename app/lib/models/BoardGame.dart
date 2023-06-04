@@ -233,6 +233,26 @@ class BoardGame extends Model {
     modelSchemaDefinition.name = "BoardGame";
     modelSchemaDefinition.pluralName = "BoardGames";
     
+    modelSchemaDefinition.authRules = [
+      AuthRule(
+        authStrategy: AuthStrategy.PUBLIC,
+        provider: AuthRuleProvider.IAM,
+        operations: [
+          ModelOperation.READ
+        ]),
+      AuthRule(
+        authStrategy: AuthStrategy.OWNER,
+        ownerField: "owner",
+        identityClaim: "cognito:username",
+        provider: AuthRuleProvider.USERPOOLS,
+        operations: [
+          ModelOperation.CREATE,
+          ModelOperation.UPDATE,
+          ModelOperation.DELETE,
+          ModelOperation.READ
+        ])
+    ];
+    
     modelSchemaDefinition.addField(ModelFieldDefinition.id());
     
     modelSchemaDefinition.addField(ModelFieldDefinition.field(

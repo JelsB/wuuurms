@@ -194,3 +194,51 @@ Adding a new DDB table to store boardgames.
 > "There was an error pulling the backend environment dev.
 🛑 Syntax Error: Invalid number, expected digit but got: "O".
 
+## All public read access to a table
+Goal is to displat public access to list of boardgames. A few different approaches were tried before a working solution was found.
+### Working solution
+1. Specify authentication on the model. Read is public, an owner can do anything.
+   ```
+   type BoardGame @model @auth(rules: [
+      { allow: public, operations: [read],  provider: iam},
+      { allow: owner }
+      ]) {
+   ```
+2. Allow unauthenticated users. Change `allowUnauthenticatedIdentities` to `true` in `app/amplify/backend/auth/hex5dfb724f/cli-inputs.json` (see [Not working solution](#not-working-solution) on why using the `amplify` cli directly did not work)
+3. Run `amplify push`. This updates the `Amplify Cognito Stack` Cfn stack by updating the Cognito Identidy pool for guests. **TODO:** The unauthenticated IAM role looks the same as the authenticated IAM role. From this, it seems to also allow all CRUD operations. Need to investigate this further.
+4. Use `IAM mode` when fetching public items.
+   ```dart
+   final request = ModelQueries.list(BoardGame.classType,
+          authorizationMode: APIAuthorizationType.iam);
+      final response = await Amplify.API.query(request: request).response;
+   ```
+### Not working solution 
+- Following the Amplify [docs to add guest access](https://docs.amplify.aws/lib/auth/guest_access/q/platform/flutter/), I ended up with the following configuration:
+![Amplify cli commands to try and add guest access](images/try-add-public-auth.png)
+Unfortunately, this did not result in the correct solution because it was trying to duplicate IAM configuratation on `amplify push`. Maybe I did something wrong.![Fail to push duplicated IAM configuration via amplify push](images/duplicated-iam-config-public-auth-via-cli.png)
+
+- Using the default authorisation mode for public items does not work. It results in a query exception.
+```dart
+   final request = ModelQueries.list(BoardGame.classType);
+   final response = await Amplify.API.query(request: request).response;
+```
+Uses no specific authorisation mode in the query request. The default use `AMAZON_COGNITO_USER_POOLS` as specified in `amplify/backend/api/hex/cli-inputs.json`
+```
+Query failed: UnknownException {
+  "message": "unable to send GraphQLRequest to client.",
+  "underlyingException": "SignedOutException {\n  \"message\": \"No user is currently signed in\"\n}"
+}
+``` 
+> **What have I learnt?** 
+> - Running `amplify pull` can override your local setup with the cloud setup. This is useful when you tried a bunch of local config but cannot undo it do to a number of gitignored files.
+> - You need to deploy the IAM authentication mode resources via `amplify push` before you can run queries with the IAM mode. Otherwise you get following error:
+> 
+> ```
+>  Query failed: UnknownException {
+>  "message": "unable to send GraphQLRequest to client.",
+>  "underlyingException": "SessionExpiredException {\n  \"message\": \"The AWS credentials could not
+>  be retrieved\",\n  \"recoverySuggestion\": \"Invoke Amplify.Auth.signIn to re-authenticate the
+>  user\",\n  \"underlyingException\": \"NotAuthorizedException {\\n  message=Unauthenticated access
+>  is not supported for this identity pool.,\\n}\"\n}"
+>  }
+>  ```

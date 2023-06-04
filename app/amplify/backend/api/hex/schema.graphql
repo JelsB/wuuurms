@@ -10,7 +10,10 @@ enum BoardGameType {
   WORKER_PLACEMENT
 }
 
-type BoardGame @model {
+type BoardGame @model @auth(rules: [
+  { allow: public, operations: [read],  provider: iam},
+  { allow: owner }
+]) {
   id: ID!
   name: String!
   description: String!
