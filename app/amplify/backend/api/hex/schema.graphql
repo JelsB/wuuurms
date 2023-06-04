@@ -4,3 +4,19 @@ type BudgetEntry @model @auth(rules: [{ allow: owner }]) {
   description: String
   amount: Float!
 }
+
+# enum BoardGameType {
+#   CO-OP,
+#   WORKER-PLACEMENT
+# }
+
+type BoardGame @model {
+  id: ID!
+  name: String!
+  description: String!
+  minimumNumberOfPlayers: Int!
+  maximumNumberOfPlayers: Int
+  minimumDuration: Int!
+  maximumDuration: Int
+  # type: BoardGameType!
+}

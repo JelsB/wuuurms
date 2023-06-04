@@ -150,3 +150,21 @@ First idea was to call the authenticator after going to the login page but the `
 > - Routes don't update with *hot reload*. You need to restart the application.
 > - `Authenticator` component does not work on Desktop
 > - Specific screens for authentication doens't work with `Authenticator`'s `builder` config 
+
+## Add new table
+Adding a new DDB table to store boardgames.
+1. Manually create new schmema in `amplify/backend/api/hex/schema.graphql`
+   1. Start with public one
+      ```graphql
+      type BoardGame @model {
+         id: ID!
+         name: String!
+         description: String!
+         minimumNumberOfPlayers: Int!
+         maximumNumberOfPlayers: Int
+         minimumDuration: Int!
+         maximumDuration: Int
+         }
+      ```
+   2. Run `amplify push`. It will fetch the cloud environment and update resources when needed. Iill show which Cfn stacks will be updated. Here, it wil update the api stack. It will create new resources for our new model.
+   3. Run `amplify codegen models` to create the actual models in `lib/models`.
