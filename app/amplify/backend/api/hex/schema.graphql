@@ -5,10 +5,10 @@ type BudgetEntry @model @auth(rules: [{ allow: owner }]) {
   amount: Float!
 }
 
-# enum BoardGameType {
-#   CO-OP,
-#   WORKER-PLACEMENT
-# }
+enum BoardGameType {
+  CO_OP,
+  WORKER_PLACEMENT
+}
 
 type BoardGame @model {
   id: ID!
@@ -18,5 +18,5 @@ type BoardGame @model {
   maximumNumberOfPlayers: Int
   minimumDuration: Int!
   maximumDuration: Int
-  # type: BoardGameType!
+  type: BoardGameType!
 }

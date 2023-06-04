@@ -146,7 +146,7 @@ Instead of adding the login when entering the app/site, it is desirable to alrea
 First idea was to call the authenticator after going to the login page but the `Authenticator` component already has the built-in functionality to limit authentication to certain pages. See [the docs](https://ui.docs.amplify.aws/flutter/connected-components/authenticator/customization).
 
 1. We add another route `/login` which requires authentication. Other current routes are public.
-> **What have I learnt?** \
+> **What have I learnt?** 
 > - Routes don't update with *hot reload*. You need to restart the application.
 > - `Authenticator` component does not work on Desktop
 > - Specific screens for authentication doens't work with `Authenticator`'s `builder` config 
@@ -168,3 +168,29 @@ Adding a new DDB table to store boardgames.
       ```
    2. Run `amplify push`. It will fetch the cloud environment and update resources when needed. Iill show which Cfn stacks will be updated. Here, it wil update the api stack. It will create new resources for our new model.
    3. Run `amplify codegen models` to create the actual models in `lib/models`.
+   4. Adapt schema by adding a field with a restricted set of values via an `enum`
+      ```
+      enum BoardGameType {
+         CO_OP,
+         WORKER_PLACEMENT
+      }
+
+      type BoardGame @model {
+         id: ID!
+         name: String!
+         description: String!
+         minimumNumberOfPlayers: Int!
+         maximumNumberOfPlayers: Int
+         minimumDuration: Int!
+         maximumDuration: Int
+         type: BoardGameType!
+      }
+      ```
+   5. Run `amplify codegen models` (it can be run before `amplify push`)
+   6. Run `amplify push`
+
+> **What have I learnt?** 
+> - schema keys cannot contain `-`. Must begin with a letter (`a-z` or `A-Z`) or an underscore (`_`). Names cannot start with a number or any other character.  Following the initial character, names can contain alphanumeric characters (a-z, A-Z, 0-9) and underscores (`_`). Other special characters or symbols are not allowed. It can result in obscure errors on `amplify push`: 
+> "There was an error pulling the backend environment dev.
+🛑 Syntax Error: Invalid number, expected digit but got: "O".
+

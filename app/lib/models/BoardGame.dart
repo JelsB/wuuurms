@@ -19,6 +19,7 @@
 
 // ignore_for_file: public_member_api_docs, annotate_overrides, dead_code, dead_codepublic_member_api_docs, depend_on_referenced_packages, file_names, library_private_types_in_public_api, no_leading_underscores_for_library_prefixes, no_leading_underscores_for_local_identifiers, non_constant_identifier_names, null_check_on_nullable_type_parameter, prefer_adjacent_string_concatenation, prefer_const_constructors, prefer_if_null_operators, prefer_interpolation_to_compose_strings, slash_for_doc_comments, sort_child_properties_last, unnecessary_const, unnecessary_constructor_name, unnecessary_late, unnecessary_new, unnecessary_null_aware_assignments, unnecessary_nullable_for_final_variable_declarations, unnecessary_string_interpolations, use_build_context_synchronously
 
+import 'ModelProvider.dart';
 import 'package:amplify_core/amplify_core.dart';
 import 'package:flutter/foundation.dart';
 
@@ -34,6 +35,7 @@ class BoardGame extends Model {
   final int? _maximumNumberOfPlayers;
   final int? _minimumDuration;
   final int? _maximumDuration;
+  final BoardGameType? _type;
   final TemporalDateTime? _createdAt;
   final TemporalDateTime? _updatedAt;
 
@@ -110,6 +112,19 @@ class BoardGame extends Model {
     return _maximumDuration;
   }
   
+  BoardGameType get type {
+    try {
+      return _type!;
+    } catch(e) {
+      throw new AmplifyCodeGenModelException(
+          AmplifyExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage,
+          recoverySuggestion:
+            AmplifyExceptionMessages.codeGenRequiredFieldForceCastRecoverySuggestion,
+          underlyingException: e.toString()
+          );
+    }
+  }
+  
   TemporalDateTime? get createdAt {
     return _createdAt;
   }
@@ -118,9 +133,9 @@ class BoardGame extends Model {
     return _updatedAt;
   }
   
-  const BoardGame._internal({required this.id, required name, required description, required minimumNumberOfPlayers, maximumNumberOfPlayers, required minimumDuration, maximumDuration, createdAt, updatedAt}): _name = name, _description = description, _minimumNumberOfPlayers = minimumNumberOfPlayers, _maximumNumberOfPlayers = maximumNumberOfPlayers, _minimumDuration = minimumDuration, _maximumDuration = maximumDuration, _createdAt = createdAt, _updatedAt = updatedAt;
+  const BoardGame._internal({required this.id, required name, required description, required minimumNumberOfPlayers, maximumNumberOfPlayers, required minimumDuration, maximumDuration, required type, createdAt, updatedAt}): _name = name, _description = description, _minimumNumberOfPlayers = minimumNumberOfPlayers, _maximumNumberOfPlayers = maximumNumberOfPlayers, _minimumDuration = minimumDuration, _maximumDuration = maximumDuration, _type = type, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory BoardGame({String? id, required String name, required String description, required int minimumNumberOfPlayers, int? maximumNumberOfPlayers, required int minimumDuration, int? maximumDuration}) {
+  factory BoardGame({String? id, required String name, required String description, required int minimumNumberOfPlayers, int? maximumNumberOfPlayers, required int minimumDuration, int? maximumDuration, required BoardGameType type}) {
     return BoardGame._internal(
       id: id == null ? UUID.getUUID() : id,
       name: name,
@@ -128,7 +143,8 @@ class BoardGame extends Model {
       minimumNumberOfPlayers: minimumNumberOfPlayers,
       maximumNumberOfPlayers: maximumNumberOfPlayers,
       minimumDuration: minimumDuration,
-      maximumDuration: maximumDuration);
+      maximumDuration: maximumDuration,
+      type: type);
   }
   
   bool equals(Object other) {
@@ -145,7 +161,8 @@ class BoardGame extends Model {
       _minimumNumberOfPlayers == other._minimumNumberOfPlayers &&
       _maximumNumberOfPlayers == other._maximumNumberOfPlayers &&
       _minimumDuration == other._minimumDuration &&
-      _maximumDuration == other._maximumDuration;
+      _maximumDuration == other._maximumDuration &&
+      _type == other._type;
   }
   
   @override
@@ -163,6 +180,7 @@ class BoardGame extends Model {
     buffer.write("maximumNumberOfPlayers=" + (_maximumNumberOfPlayers != null ? _maximumNumberOfPlayers!.toString() : "null") + ", ");
     buffer.write("minimumDuration=" + (_minimumDuration != null ? _minimumDuration!.toString() : "null") + ", ");
     buffer.write("maximumDuration=" + (_maximumDuration != null ? _maximumDuration!.toString() : "null") + ", ");
+    buffer.write("type=" + (_type != null ? enumToString(_type)! : "null") + ", ");
     buffer.write("createdAt=" + (_createdAt != null ? _createdAt!.format() : "null") + ", ");
     buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt!.format() : "null"));
     buffer.write("}");
@@ -170,7 +188,7 @@ class BoardGame extends Model {
     return buffer.toString();
   }
   
-  BoardGame copyWith({String? name, String? description, int? minimumNumberOfPlayers, int? maximumNumberOfPlayers, int? minimumDuration, int? maximumDuration}) {
+  BoardGame copyWith({String? name, String? description, int? minimumNumberOfPlayers, int? maximumNumberOfPlayers, int? minimumDuration, int? maximumDuration, BoardGameType? type}) {
     return BoardGame._internal(
       id: id,
       name: name ?? this.name,
@@ -178,7 +196,8 @@ class BoardGame extends Model {
       minimumNumberOfPlayers: minimumNumberOfPlayers ?? this.minimumNumberOfPlayers,
       maximumNumberOfPlayers: maximumNumberOfPlayers ?? this.maximumNumberOfPlayers,
       minimumDuration: minimumDuration ?? this.minimumDuration,
-      maximumDuration: maximumDuration ?? this.maximumDuration);
+      maximumDuration: maximumDuration ?? this.maximumDuration,
+      type: type ?? this.type);
   }
   
   BoardGame.fromJson(Map<String, dynamic> json)  
@@ -189,15 +208,16 @@ class BoardGame extends Model {
       _maximumNumberOfPlayers = (json['maximumNumberOfPlayers'] as num?)?.toInt(),
       _minimumDuration = (json['minimumDuration'] as num?)?.toInt(),
       _maximumDuration = (json['maximumDuration'] as num?)?.toInt(),
+      _type = enumFromString<BoardGameType>(json['type'], BoardGameType.values),
       _createdAt = json['createdAt'] != null ? TemporalDateTime.fromString(json['createdAt']) : null,
       _updatedAt = json['updatedAt'] != null ? TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'name': _name, 'description': _description, 'minimumNumberOfPlayers': _minimumNumberOfPlayers, 'maximumNumberOfPlayers': _maximumNumberOfPlayers, 'minimumDuration': _minimumDuration, 'maximumDuration': _maximumDuration, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'name': _name, 'description': _description, 'minimumNumberOfPlayers': _minimumNumberOfPlayers, 'maximumNumberOfPlayers': _maximumNumberOfPlayers, 'minimumDuration': _minimumDuration, 'maximumDuration': _maximumDuration, 'type': enumToString(_type), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
-    'id': id, 'name': _name, 'description': _description, 'minimumNumberOfPlayers': _minimumNumberOfPlayers, 'maximumNumberOfPlayers': _maximumNumberOfPlayers, 'minimumDuration': _minimumDuration, 'maximumDuration': _maximumDuration, 'createdAt': _createdAt, 'updatedAt': _updatedAt
+    'id': id, 'name': _name, 'description': _description, 'minimumNumberOfPlayers': _minimumNumberOfPlayers, 'maximumNumberOfPlayers': _maximumNumberOfPlayers, 'minimumDuration': _minimumDuration, 'maximumDuration': _maximumDuration, 'type': _type, 'createdAt': _createdAt, 'updatedAt': _updatedAt
   };
 
   static final QueryModelIdentifier<BoardGameModelIdentifier> MODEL_IDENTIFIER = QueryModelIdentifier<BoardGameModelIdentifier>();
@@ -208,6 +228,7 @@ class BoardGame extends Model {
   static final QueryField MAXIMUMNUMBEROFPLAYERS = QueryField(fieldName: "maximumNumberOfPlayers");
   static final QueryField MINIMUMDURATION = QueryField(fieldName: "minimumDuration");
   static final QueryField MAXIMUMDURATION = QueryField(fieldName: "maximumDuration");
+  static final QueryField TYPE = QueryField(fieldName: "type");
   static var schema = Model.defineSchema(define: (ModelSchemaDefinition modelSchemaDefinition) {
     modelSchemaDefinition.name = "BoardGame";
     modelSchemaDefinition.pluralName = "BoardGames";
@@ -248,6 +269,12 @@ class BoardGame extends Model {
       key: BoardGame.MAXIMUMDURATION,
       isRequired: false,
       ofType: ModelFieldType(ModelFieldTypeEnum.int)
+    ));
+    
+    modelSchemaDefinition.addField(ModelFieldDefinition.field(
+      key: BoardGame.TYPE,
+      isRequired: true,
+      ofType: ModelFieldType(ModelFieldTypeEnum.enumeration)
     ));
     
     modelSchemaDefinition.addField(ModelFieldDefinition.nonQueryField(
