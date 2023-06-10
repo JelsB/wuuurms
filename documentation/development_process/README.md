@@ -252,3 +252,5 @@ Goals is to allow admin users to add boardgames.
 > - form field controllers are not necessarilty better than `onSaved` callback functions but they make handling nullable types easier I find. Because `onSaved` expects a nullable type but to me, the validator should take care of this being not null (but it also returns a nullable type).
 > - form field controllers cannot be used with the `DropdownButtonFormField`
 > - when a logged-in user needs to perform an API call that is public with IAM, be sure to specify that it needs to use `UserPools` instead of IAM.
+> - Don't put logic in `createState()` of widgets. The widget parent class is accessible via the `widget` field
+> - excecution a function from a widget which containts another widget can be done by passing the function to the contained widget. This is useful for updating the state of the top level widget after an action of the contained widget.
