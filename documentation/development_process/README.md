@@ -195,7 +195,7 @@ Adding a new DDB table to store boardgames.
 🛑 Syntax Error: Invalid number, expected digit but got: "O".
 
 ## All public read access to a table
-Goal is to displat public access to list of boardgames. A few different approaches were tried before a working solution was found.
+Goal is to display public access to list of boardgames. A few different approaches were tried before a working solution was found.
 ### Working solution
 1. Specify authentication on the model. Read is public, an owner can do anything.
    ```
@@ -242,3 +242,12 @@ Query failed: UnknownException {
 >  is not supported for this identity pool.,\\n}\"\n}"
 >  }
 >  ```
+
+## Add boardgames via submit form
+Goals is to allow admin users to add boardgames.
+1. Adding a new `SubmitForm` widget which is deplayed on the boardgames pages.
+
+
+> **What have I learnt?** 
+> - form field controllers are not necessarilty better than `onSaved` callback functions but they make handling nullable types easier I find. Because `onSaved` expects a nullable type but to me, the validator should take care of this being not null (but it also returns a nullable type).
+> - form field controllers cannot be used with the `DropdownButtonFormField`

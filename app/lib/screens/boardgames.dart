@@ -1,5 +1,6 @@
 import 'package:amplify_api/amplify_api.dart';
 import 'package:app/models/BoardGame.dart';
+import 'package:app/models/BoardGameType.dart';
 import 'package:flutter/material.dart';
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
@@ -17,6 +18,8 @@ class BoardGamesScreen extends StatefulWidget {
 
 class _BoardGamesScreenState extends State<BoardGamesScreen> {
   var _boardgames = <BoardGame>[];
+
+  bool _showSubmitForm = false;
 
   @override
   void initState() {
@@ -57,37 +60,234 @@ class _BoardGamesScreenState extends State<BoardGamesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('BoardGames'),
-      ),
-      body: GridView.builder(
-        itemCount: _boardgames.length,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          mainAxisSpacing: 8.0,
-          crossAxisSpacing: 8.0,
-          childAspectRatio: 1.0,
+        appBar: AppBar(
+          title: const Text('BoardGames'),
         ),
-        itemBuilder: (BuildContext context, int index) {
-          return Container(
-            color: Colors.blue,
-            child: Center(
-              child: Text(
-                _boardgames[index].name,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            setState(() {
+              _showSubmitForm = !_showSubmitForm;
+            });
+          },
+          child: Icon(_showSubmitForm ? Icons.close : Icons.add),
+        ),
+        body: Column(children: [
+          Expanded(
+            child: GridView.builder(
+              itemCount: _boardgames.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 8.0,
+                crossAxisSpacing: 8.0,
+                childAspectRatio: 1.0,
+              ),
+              itemBuilder: (BuildContext context, int index) {
+                return Container(
+                  color: Colors.blue,
+                  child: Center(
+                    child: Text(
+                      _boardgames[index].name,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          if (_showSubmitForm) _SubmitForm(),
+        ]));
+  }
+}
+
+class _SubmitForm extends StatefulWidget {
+  @override
+  _SubmitFormState createState() => _SubmitFormState();
+}
+
+class _SubmitFormState extends State<_SubmitForm> {
+  final _formKey = GlobalKey<FormState>();
+  TextEditingController _nameController = TextEditingController();
+  TextEditingController _descriptionController = TextEditingController();
+  TextEditingController _minimumNumberOfPlayersController =
+      TextEditingController();
+  TextEditingController _minimumDurationController = TextEditingController();
+  TextEditingController _maximumNumberOfPlayersController =
+      TextEditingController();
+  TextEditingController _maximumDurationController = TextEditingController();
+
+// controllers don't work with dropdown fields
+  BoardGameType? _boardgameType;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _descriptionController.dispose();
+    _minimumNumberOfPlayersController.dispose();
+    _minimumDurationController.dispose();
+    _maximumNumberOfPlayersController.dispose();
+    _maximumDurationController.dispose();
+    super.dispose();
+  }
+
+  Future<void> submitForm() async {
+    var currentState = _formKey.currentState;
+    // type narrowing, remove nullable
+    if (currentState == null) {
+      return;
+    }
+
+    if (!currentState.validate()) {
+      return;
+    }
+    //need to explicitly save state for _boargameType
+    currentState.save();
+
+    final name = _nameController.text;
+    final description = _descriptionController.text;
+    final minimumNumberOfPlayers =
+        int.parse(_minimumNumberOfPlayersController.text);
+    final minimumDuration = int.parse(_minimumDurationController.text);
+    final BoardGameType type =
+        _boardgameType!; //it cannot be null due to form validation
+    final maximumNumberOfPlayers =
+        int.parse(_maximumNumberOfPlayersController.text);
+    final maximumDuration = int.parse(_maximumDurationController.text);
+
+    // Perform form submission with the entered values
+    // You can send the data to your GraphQL endpoint here
+    final newBoardgame = BoardGame(
+        name: name,
+        description: description,
+        minimumNumberOfPlayers: minimumNumberOfPlayers,
+        maximumNumberOfPlayers: maximumNumberOfPlayers,
+        minimumDuration: minimumDuration,
+        maximumDuration: maximumDuration,
+        type: type);
+    final request = ModelMutations.create(newBoardgame);
+    final response = await Amplify.API.mutate(request: request).response;
+    safePrint('Create result: $response');
+
+    // Reset the form after submission
+    _formKey.currentState?.reset();
+
+    // Clear the form field values
+    _nameController.clear();
+    _descriptionController.clear();
+    _minimumNumberOfPlayersController.clear();
+    _minimumDurationController.clear();
+    _maximumNumberOfPlayersController.clear();
+    _maximumDurationController.clear();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Add boardgame',
+              style: TextStyle(
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold,
               ),
             ),
-          );
-        },
+            const SizedBox(height: 16.0),
+            TextFormField(
+              controller: _nameController,
+              decoration: const InputDecoration(labelText: 'Name'),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a name';
+                }
+                return null;
+              },
+            ),
+            TextFormField(
+              controller: _descriptionController,
+              decoration: const InputDecoration(labelText: 'Description'),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a description';
+                }
+                return null;
+              },
+            ),
+            TextFormField(
+              controller: _minimumNumberOfPlayersController,
+              decoration:
+                  const InputDecoration(labelText: 'Minimum Number of Players'),
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter the minimum number of players';
+                }
+                return null;
+              },
+            ),
+            TextFormField(
+              controller: _maximumNumberOfPlayersController,
+              decoration: const InputDecoration(
+                  labelText: 'Maximum Number of Players (Optional)'),
+              keyboardType: TextInputType.number,
+            ),
+            TextFormField(
+              controller: _minimumDurationController,
+              decoration: const InputDecoration(
+                  labelText: 'Minimum Duration in minutes'),
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter the minimum duration';
+                }
+                return null;
+              },
+            ),
+            TextFormField(
+              controller: _maximumDurationController,
+              decoration: const InputDecoration(
+                  labelText: 'Maximum Duration in minutes (Optional)'),
+              keyboardType: TextInputType.number,
+            ),
+            DropdownButtonFormField<BoardGameType>(
+              value: _boardgameType,
+              onChanged: (BoardGameType? newValue) {
+                setState(() {
+                  _boardgameType = newValue;
+                });
+              },
+              validator: (value) {
+                if (value == null) {
+                  return 'Please select a type';
+                }
+                return null;
+              },
+              decoration: const InputDecoration(labelText: 'Type of boardgame'),
+              items: BoardGameType.values.map((type) {
+                return DropdownMenuItem<BoardGameType>(
+                  value: type,
+                  child: Text(type.toString().split('.').last),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 16.0),
+            ElevatedButton(
+              onPressed: submitForm,
+              child: const Text('Submit'),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
-
 // class GridListDemo extends StatelessWidget {
 //   const GridListDemo({super.key});
 
