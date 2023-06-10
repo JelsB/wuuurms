@@ -103,14 +103,18 @@ class _BoardGamesScreenState extends State<BoardGamesScreen> {
               },
             ),
           ),
-          if (_showSubmitForm) _SubmitForm(),
+          if (_showSubmitForm) _SubmitForm(_fetchBoardGames),
         ]));
   }
 }
 
 class _SubmitForm extends StatefulWidget {
+  final Future<void> Function() toCallAfterSubmission;
+
+  const _SubmitForm(this.toCallAfterSubmission);
+
   @override
-  _SubmitFormState createState() => _SubmitFormState();
+  _SubmitFormState createState() => _SubmitFormState(toCallAfterSubmission);
 }
 
 class _SubmitFormState extends State<_SubmitForm> {
@@ -126,6 +130,10 @@ class _SubmitFormState extends State<_SubmitForm> {
 
 // controllers don't work with dropdown fields
   BoardGameType? _boardgameType;
+
+  final Future<void> Function() toCallAfterSubmission;
+
+  _SubmitFormState(this.toCallAfterSubmission);
 
   @override
   void dispose() {
@@ -175,6 +183,8 @@ class _SubmitFormState extends State<_SubmitForm> {
     final request = ModelMutations.create(newBoardgame);
     final response = await Amplify.API.mutate(request: request).response;
     safePrint('Create result: $response');
+
+    toCallAfterSubmission();
 
     // Reset the form after submission
     _formKey.currentState?.reset();
