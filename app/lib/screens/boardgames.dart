@@ -114,7 +114,7 @@ class _SubmitForm extends StatefulWidget {
   const _SubmitForm(this.toCallAfterSubmission);
 
   @override
-  _SubmitFormState createState() => _SubmitFormState(toCallAfterSubmission);
+  _SubmitFormState createState() => _SubmitFormState();
 }
 
 class _SubmitFormState extends State<_SubmitForm> {
@@ -130,10 +130,6 @@ class _SubmitFormState extends State<_SubmitForm> {
 
 // controllers don't work with dropdown fields
   BoardGameType? _boardgameType;
-
-  final Future<void> Function() toCallAfterSubmission;
-
-  _SubmitFormState(this.toCallAfterSubmission);
 
   @override
   void dispose() {
@@ -184,7 +180,7 @@ class _SubmitFormState extends State<_SubmitForm> {
     final response = await Amplify.API.mutate(request: request).response;
     safePrint('Create result: $response');
 
-    toCallAfterSubmission();
+    widget.toCallAfterSubmission();
 
     // Reset the form after submission
     _formKey.currentState?.reset();
