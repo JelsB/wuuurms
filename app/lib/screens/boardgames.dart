@@ -29,16 +29,21 @@ class _BoardGamesScreenState extends State<BoardGamesScreen> {
 
   Future<void> _fetchBoardGames() async {
     safePrint('Getting boardgames');
+    bool signedInUser = false;
     try {
       final result = await Amplify.Auth.fetchAuthSession();
       safePrint('User is signed in: ${result.isSignedIn}');
+      signedInUser = result.isSignedIn;
     } on AuthException catch (e) {
       safePrint('Error retrieving auth session: ${e.message}');
     }
 
     try {
       final request = ModelQueries.list(BoardGame.classType,
-          authorizationMode: APIAuthorizationType.iam);
+          authorizationMode: signedInUser
+              ? APIAuthorizationType.userPools
+              : APIAuthorizationType.iam);
+
       final response = await Amplify.API.query(request: request).response;
       final games = response.data?.items;
 

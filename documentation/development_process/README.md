@@ -251,3 +251,4 @@ Goals is to allow admin users to add boardgames.
 > **What have I learnt?** 
 > - form field controllers are not necessarilty better than `onSaved` callback functions but they make handling nullable types easier I find. Because `onSaved` expects a nullable type but to me, the validator should take care of this being not null (but it also returns a nullable type).
 > - form field controllers cannot be used with the `DropdownButtonFormField`
+> - when a logged-in user needs to perform an API call that is public with IAM, be sure to specify that it needs to use `UserPools` instead of IAM.
