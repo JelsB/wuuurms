@@ -246,11 +246,13 @@ Query failed: UnknownException {
 ## Add boardgames via submit form
 Goals is to allow admin users to add boardgames.
 1. Adding a new `SubmitForm` widget which is deplayed on the boardgames pages.
+2. Show buttom to add boardgame when user is logged in
 
 
 > **What have I learnt?** 
-> - form field controllers are not necessarilty better than `onSaved` callback functions but they make handling nullable types easier I find. Because `onSaved` expects a nullable type but to me, the validator should take care of this being not null (but it also returns a nullable type).
-> - form field controllers cannot be used with the `DropdownButtonFormField`
-> - when a logged-in user needs to perform an API call that is public with IAM, be sure to specify that it needs to use `UserPools` instead of IAM.
+> - Form field controllers are not necessarilty better than `onSaved` callback functions but they make handling nullable types easier I find. Because `onSaved` expects a nullable type but to me, the validator should take care of this being not null (but it also returns a nullable type).
+> - Form field controllers cannot be used with the `DropdownButtonFormField`
+> - When a logged-in user needs to perform an API call that is public with IAM, be sure to specify that it needs to use `UserPools` instead of IAM.
 > - Don't put logic in `createState()` of widgets. The widget parent class is accessible via the `widget` field
-> - excecution a function from a widget which containts another widget can be done by passing the function to the contained widget. This is useful for updating the state of the top level widget after an action of the contained widget.
+> - Excecution a function from a widget which containts another widget can be done by passing the function to the contained widget. This is useful for updating the state of the top level widget after an action of the contained widget.
+> - Saving state in asynchronouly in private upon which other aysnc flogic is based is not great. I.e. for knowing if a user is logged in or not. It is not recommended to make the `initState()` method itself async. The `initState()` method is a lifecycle method in Flutter, and it should not be marked as async since it needs to return immediately. Global state management could be a solution.
