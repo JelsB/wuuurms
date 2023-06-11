@@ -21,26 +21,38 @@ class _BoardGamesScreenState extends State<BoardGamesScreen> {
 
   bool _showSubmitForm = false;
 
+  bool _userIsSignedIn = false;
+
   @override
   void initState() {
     super.initState();
+    _checkIfUserIsSignedIn();
     _fetchBoardGames();
+  }
+
+  Future<void> _checkIfUserIsSignedIn() async {
+    try {
+      final result = await Amplify.Auth.fetchAuthSession();
+      safePrint('User is signed in: ${result.isSignedIn}');
+      _userIsSignedIn = result.isSignedIn;
+    } on AuthException catch (e) {
+      safePrint('Error retrieving auth session: ${e.message}');
+    }
   }
 
   Future<void> _fetchBoardGames() async {
     safePrint('Getting boardgames');
-    bool signedInUser = false;
-    try {
-      final result = await Amplify.Auth.fetchAuthSession();
-      safePrint('User is signed in: ${result.isSignedIn}');
-      signedInUser = result.isSignedIn;
-    } on AuthException catch (e) {
-      safePrint('Error retrieving auth session: ${e.message}');
-    }
+
+    // explitly check if user is logged in and wait for response
+    // to avoid race conditions where the user is actually logged in
+    // but the `_userIsSignedIn` is not updated yet.
+    // In the future, this could be avoided with global state
+    // management in this app.
+    await _checkIfUserIsSignedIn();
 
     try {
       final request = ModelQueries.list(BoardGame.classType,
-          authorizationMode: signedInUser
+          authorizationMode: _userIsSignedIn
               ? APIAuthorizationType.userPools
               : APIAuthorizationType.iam);
 
@@ -68,14 +80,16 @@ class _BoardGamesScreenState extends State<BoardGamesScreen> {
         appBar: AppBar(
           title: const Text('BoardGames'),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            setState(() {
-              _showSubmitForm = !_showSubmitForm;
-            });
-          },
-          child: Icon(_showSubmitForm ? Icons.close : Icons.add),
-        ),
+        floatingActionButton: _userIsSignedIn
+            ? FloatingActionButton(
+                onPressed: () {
+                  setState(() {
+                    _showSubmitForm = !_showSubmitForm;
+                  });
+                },
+                child: Icon(_showSubmitForm ? Icons.close : Icons.add),
+              )
+            : null,
         body: Column(children: [
           Expanded(
             child: GridView.builder(
