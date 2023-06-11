@@ -31,13 +31,18 @@ class _BoardGamesScreenState extends State<BoardGamesScreen> {
   }
 
   Future<void> _checkIfUserIsSignedIn() async {
+    var signedIn = false;
     try {
       final result = await Amplify.Auth.fetchAuthSession();
       safePrint('User is signed in: ${result.isSignedIn}');
-      _userIsSignedIn = result.isSignedIn;
+      signedIn = result.isSignedIn;
     } on AuthException catch (e) {
       safePrint('Error retrieving auth session: ${e.message}');
     }
+
+    setState(() {
+      _userIsSignedIn = signedIn;
+    });
   }
 
   Future<void> _fetchBoardGames() async {
