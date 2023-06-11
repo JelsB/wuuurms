@@ -1,6 +1,7 @@
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:app/models/BudgetEntry.dart';
+import 'package:app/widgets/appBar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -105,9 +106,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
         onPressed: _navigateToBudgetEntry,
         child: const Icon(Icons.add),
       ),
-      appBar: AppBar(
-        title: const Text('My Budgets'),
-      ),
+      appBar: const MyAppBar(title: 'My Budgets'),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.only(top: 25),

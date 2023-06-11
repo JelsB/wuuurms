@@ -1,6 +1,7 @@
 import 'package:amplify_api/amplify_api.dart';
 import 'package:app/models/BoardGame.dart';
 import 'package:app/models/BoardGameType.dart';
+import 'package:app/widgets/appBar.dart';
 import 'package:flutter/material.dart';
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
@@ -90,9 +91,7 @@ class _BoardGamesScreenState extends State<BoardGamesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('BoardGames'),
-        ),
+        appBar: const MyAppBar(title: 'Boardgames'),
         floatingActionButton: _userIsSignedIn
             ? FloatingActionButton(
                 onPressed: () {

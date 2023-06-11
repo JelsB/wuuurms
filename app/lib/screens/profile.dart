@@ -1,3 +1,4 @@
+import 'package:app/widgets/appBar.dart';
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -17,10 +18,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('PROFILE'),
-      ),
+    return const Scaffold(
+      appBar: MyAppBar(title: 'Profile'),
     );
   }
 }

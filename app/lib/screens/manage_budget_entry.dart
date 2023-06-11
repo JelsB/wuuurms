@@ -1,6 +1,7 @@
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:app/models/BudgetEntry.dart';
+import 'package:app/widgets/appBar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -92,9 +93,7 @@ class _ManageBudgetEntryScreenState extends State<ManageBudgetEntryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_titleText),
-      ),
+      appBar: MyAppBar(title: _titleText),
       body: Align(
         alignment: Alignment.topCenter,
         child: ConstrainedBox(
