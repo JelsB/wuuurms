@@ -119,14 +119,16 @@ class _SubmitForm extends StatefulWidget {
 
 class _SubmitFormState extends State<_SubmitForm> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _descriptionController = TextEditingController();
-  TextEditingController _minimumNumberOfPlayersController =
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _minimumNumberOfPlayersController =
       TextEditingController();
-  TextEditingController _minimumDurationController = TextEditingController();
-  TextEditingController _maximumNumberOfPlayersController =
+  final TextEditingController _minimumDurationController =
       TextEditingController();
-  TextEditingController _maximumDurationController = TextEditingController();
+  final TextEditingController _maximumNumberOfPlayersController =
+      TextEditingController();
+  final TextEditingController _maximumDurationController =
+      TextEditingController();
 
 // controllers don't work with dropdown fields
   BoardGameType? _boardgameType;
