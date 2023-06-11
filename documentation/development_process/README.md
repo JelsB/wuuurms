@@ -256,3 +256,6 @@ Goals is to allow admin users to add boardgames.
 > - Don't put logic in `createState()` of widgets. The widget parent class is accessible via the `widget` field
 > - Excecution a function from a widget which containts another widget can be done by passing the function to the contained widget. This is useful for updating the state of the top level widget after an action of the contained widget.
 > - Saving state in asynchronouly in private upon which other aysnc flogic is based is not great. I.e. for knowing if a user is logged in or not. It is not recommended to make the `initState()` method itself async. The `initState()` method is a lifecycle method in Flutter, and it should not be marked as async since it needs to return immediately. Global state management could be a solution.
+> - Use `setState()` inside methods when updating state like private variables.
+> - using the `late` identifier is not good when dealing with state widgets because
+> the variable needs to be initialised before the widget is built (if it uses the variable)

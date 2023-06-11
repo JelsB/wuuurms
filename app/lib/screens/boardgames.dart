@@ -23,6 +23,11 @@ class _BoardGamesScreenState extends State<BoardGamesScreen> {
 
   bool _userIsSignedIn = false;
 
+  /// Indicates if user login state has been checked explicitly
+  ///
+  /// This is useful to avoid relying on asyn operations to check this
+  bool _initialCheckIfUserIsSignedInIsDone = false;
+
   @override
   void initState() {
     super.initState();
@@ -42,25 +47,28 @@ class _BoardGamesScreenState extends State<BoardGamesScreen> {
 
     setState(() {
       _userIsSignedIn = signedIn;
+      _initialCheckIfUserIsSignedInIsDone = true;
     });
   }
 
   Future<void> _fetchBoardGames() async {
     safePrint('Getting boardgames');
 
-    // explitly check if user is logged in and wait for response
+    // if a user's login state has not been determined at least once,
+    // explitly check it and wait for response
     // to avoid race conditions where the user is actually logged in
     // but the `_userIsSignedIn` is not updated yet.
     // In the future, this could be avoided with global state
     // management in this app.
-    await _checkIfUserIsSignedIn();
+    if (!_initialCheckIfUserIsSignedInIsDone) {
+      await _checkIfUserIsSignedIn();
+    }
 
+    final request = ModelQueries.list(BoardGame.classType,
+        authorizationMode: _userIsSignedIn
+            ? APIAuthorizationType.userPools
+            : APIAuthorizationType.iam);
     try {
-      final request = ModelQueries.list(BoardGame.classType,
-          authorizationMode: _userIsSignedIn
-              ? APIAuthorizationType.userPools
-              : APIAuthorizationType.iam);
-
       final response = await Amplify.API.query(request: request).response;
       final games = response.data?.items;
 
