@@ -111,20 +111,27 @@ class _BoardGamesScreenState extends State<BoardGamesScreen> {
               )
             : null,
         body: Stack(children: [
-          GridView.count(
-            restorationId: 'grid_view_demo_grid_offset',
-            crossAxisCount: 2,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            padding: const EdgeInsets.all(8),
-            childAspectRatio: 1,
-            children: _boardGameItems().map<Widget>((game) {
-              return _GridDemoPhotoItem(
-                boardgameItem: game,
-                // tileStyle: type,
-              );
-            }).toList(),
-          ),
+          LayoutBuilder(builder: (context, constraints) {
+            // Calculate the number of columns based on the available width
+            double screenWidth = constraints.maxWidth;
+            int columnsCount = (screenWidth ~/ 300).clamp(1,
+                6); // Adjust the item width (200) and the maximum number of columns (4)
+
+            return GridView.count(
+              restorationId: 'grid_view_demo_grid_offset',
+              crossAxisCount: columnsCount,
+              mainAxisSpacing: 20,
+              crossAxisSpacing: 20,
+              padding: const EdgeInsets.all(20),
+              childAspectRatio: 1,
+              children: _boardGameItems().map<Widget>((game) {
+                return _GridDemoPhotoItem(
+                  boardgameItem: game,
+                  // tileStyle: type,
+                );
+              }).toList(),
+            );
+          }),
           if (_showSubmitForm) _SubmitForm(_fetchBoardGames),
         ]));
   }
