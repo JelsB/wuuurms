@@ -1,5 +1,6 @@
 import 'package:app/widgets/appBar.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 // import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -19,6 +20,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(appBar: MyAppBar(title: 'Hex Copy'));
+    return Scaffold(
+        appBar: MyAppBar(
+      title: 'App',
+      additionalActions: [
+        TextButton(
+          onPressed: () {
+            context.pushNamed('budgets');
+          },
+          child: const Text(
+            'Budgets',
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ],
+    ));
   }
 }

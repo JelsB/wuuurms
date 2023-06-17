@@ -13,6 +13,7 @@ final router = GoRouter(routes: [
       path: '/', name: 'home', builder: (context, state) => const HomeScreen()),
   GoRoute(
     path: '/budgets',
+    name: 'budgets',
     builder: (context, state) =>
         const AuthenticatedView(child: BudgetsScreen()),
   ),

@@ -21,12 +21,13 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       title: Text(title),
       actions: [
+        ...additionalActions, // Spread the additional actions
         TextButton(
           onPressed: () {
             context.pushNamed('boardgames');
           },
           child: const Text(
-            'Boardgames',
+            'Games',
             style: TextStyle(
               color: Colors.white,
             ),
@@ -55,7 +56,6 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
         ),
-        ...additionalActions, // Spread the additional actions
       ],
     );
   }
