@@ -3,10 +3,7 @@ import 'package:app/models/BoardGame.dart';
 import 'package:app/models/BoardGameType.dart';
 import 'package:app/widgets/appBar.dart';
 import 'package:flutter/material.dart';
-import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class BoardGamesScreen extends StatefulWidget {
   const BoardGamesScreen({
@@ -88,6 +85,17 @@ class _BoardGamesScreenState extends State<BoardGamesScreen> {
     }
   }
 
+  List<_BoardGameItem> _boardGameItems() {
+    var counter = 0;
+    List<_BoardGameItem> modifiedList = _boardgames.map((game) {
+      var assetName =
+          'lib/assets/local_tests/boardgame_image/${counter % 5}.jpg';
+      counter++;
+      return _BoardGameItem(boardgame: game, assetName: assetName);
+    }).toList();
+    return modifiedList;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,32 +110,20 @@ class _BoardGamesScreenState extends State<BoardGamesScreen> {
                 child: Icon(_showSubmitForm ? Icons.close : Icons.add),
               )
             : null,
-        body: Column(children: [
-          Expanded(
-            child: GridView.builder(
-              itemCount: _boardgames.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 8.0,
-                crossAxisSpacing: 8.0,
-                childAspectRatio: 1.0,
-              ),
-              itemBuilder: (BuildContext context, int index) {
-                return Container(
-                  color: Colors.blue,
-                  child: Center(
-                    child: Text(
-                      _boardgames[index].name,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
+        body: Stack(children: [
+          GridView.count(
+            restorationId: 'grid_view_demo_grid_offset',
+            crossAxisCount: 2,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            padding: const EdgeInsets.all(8),
+            childAspectRatio: 1,
+            children: _boardGameItems().map<Widget>((game) {
+              return _GridDemoPhotoItem(
+                boardgameItem: game,
+                // tileStyle: type,
+              );
+            }).toList(),
           ),
           if (_showSubmitForm) _SubmitForm(_fetchBoardGames),
         ]));
@@ -225,6 +221,7 @@ class _SubmitFormState extends State<_SubmitForm> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      color: Colors.white,
       padding: const EdgeInsets.all(16.0),
       child: Form(
         key: _formKey,
@@ -327,164 +324,66 @@ class _SubmitFormState extends State<_SubmitForm> {
     );
   }
 }
-// class GridListDemo extends StatelessWidget {
-//   const GridListDemo({super.key});
 
-//   List<_Photo> _photos(BuildContext context) {
-//     final localizations = GalleryLocalizations.of(context)!;
-//     return [
-//       _Photo(
-//         assetName: 'places/india_chennai_flower_market.png',
-//         title: localizations.placeChennai,
-//         subtitle: localizations.placeFlowerMarket,
-//       ),
-//       _Photo(
-//         assetName: 'places/india_tanjore_bronze_works.png',
-//         title: localizations.placeTanjore,
-//         subtitle: localizations.placeBronzeWorks,
-//       ),
-//       _Photo(
-//         assetName: 'places/india_tanjore_market_merchant.png',
-//         title: localizations.placeTanjore,
-//         subtitle: localizations.placeMarket,
-//       ),
-//       _Photo(
-//         assetName: 'places/india_tanjore_thanjavur_temple.png',
-//         title: localizations.placeTanjore,
-//         subtitle: localizations.placeThanjavurTemple,
-//       ),
-//       _Photo(
-//         assetName: 'places/india_tanjore_thanjavur_temple_carvings.png',
-//         title: localizations.placeTanjore,
-//         subtitle: localizations.placeThanjavurTemple,
-//       ),
-//       _Photo(
-//         assetName: 'places/india_pondicherry_salt_farm.png',
-//         title: localizations.placePondicherry,
-//         subtitle: localizations.placeSaltFarm,
-//       ),
-//       _Photo(
-//         assetName: 'places/india_chennai_highway.png',
-//         title: localizations.placeChennai,
-//         subtitle: localizations.placeScooters,
-//       ),
-//       _Photo(
-//         assetName: 'places/india_chettinad_silk_maker.png',
-//         title: localizations.placeChettinad,
-//         subtitle: localizations.placeSilkMaker,
-//       ),
-//       _Photo(
-//         assetName: 'places/india_chettinad_produce.png',
-//         title: localizations.placeChettinad,
-//         subtitle: localizations.placeLunchPrep,
-//       ),
-//       _Photo(
-//         assetName: 'places/india_tanjore_market_technology.png',
-//         title: localizations.placeTanjore,
-//         subtitle: localizations.placeMarket,
-//       ),
-//       _Photo(
-//         assetName: 'places/india_pondicherry_beach.png',
-//         title: localizations.placePondicherry,
-//         subtitle: localizations.placeBeach,
-//       ),
-//       _Photo(
-//         assetName: 'places/india_pondicherry_fisherman.png',
-//         title: localizations.placePondicherry,
-//         subtitle: localizations.placeFisherman,
-//       ),
-//     ];
-//   }
+class _BoardGameItem {
+  _BoardGameItem({required this.boardgame, required this.assetName});
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         automaticallyImplyLeading: false,
-//         title: Text(GalleryLocalizations.of(context)!.demoGridListsTitle),
-//       ),
-//       body: GridView.count(
-//         restorationId: 'grid_view_demo_grid_offset',
-//         crossAxisCount: 2,
-//         mainAxisSpacing: 8,
-//         crossAxisSpacing: 8,
-//         padding: const EdgeInsets.all(8),
-//         childAspectRatio: 1,
-//         children: _photos(context).map<Widget>((photo) {
-//           return _GridDemoPhotoItem(
-//             photo: photo,
-//             tileStyle: type,
-//           );
-//         }).toList(),
-//       ),
-//     );
-//   }
-// }
+  final BoardGame boardgame;
+  final String assetName;
+}
 
-// class _Photo {
-//   _Photo({
-//     required this.assetName,
-//     required this.title,
-//     required this.subtitle,
-//   });
+/// Allow the text size to shrink to fit in the space
+class _GridTitleText extends StatelessWidget {
+  const _GridTitleText(this.text);
 
-//   final String assetName;
-//   final String title;
-//   final String subtitle;
-// }
+  final String text;
 
-// /// Allow the text size to shrink to fit in the space
-// class _GridTitleText extends StatelessWidget {
-//   const _GridTitleText(this.text);
+  @override
+  Widget build(BuildContext context) {
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      alignment: AlignmentDirectional.centerStart,
+      child: Text(text),
+    );
+  }
+}
 
-//   final String text;
+class _GridDemoPhotoItem extends StatelessWidget {
+  const _GridDemoPhotoItem({
+    required this.boardgameItem,
+  });
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return FittedBox(
-//       fit: BoxFit.scaleDown,
-//       alignment: AlignmentDirectional.centerStart,
-//       child: Text(text),
-//     );
-//   }
-// }
+  final _BoardGameItem boardgameItem;
 
-// class _GridDemoPhotoItem extends StatelessWidget {
-//   const _GridDemoPhotoItem({
-//     required this.photo,
-//   });
+  @override
+  Widget build(BuildContext context) {
+    final Widget image = Semantics(
+      label: boardgameItem.boardgame.name,
+      child: Material(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+        clipBehavior: Clip.antiAlias,
+        child: Image.asset(
+          boardgameItem.assetName,
+          // package: 'flutter_gallery_assets',
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
 
-//   final _Photo photo;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final Widget image = Semantics(
-//       label: '${photo.title} ${photo.subtitle}',
-//       child: Material(
-//         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-//         clipBehavior: Clip.antiAlias,
-//         child: Image.asset(
-//           photo.assetName,
-//           package: 'flutter_gallery_assets',
-//           fit: BoxFit.cover,
-//         ),
-//       ),
-//     );
-
-//     return GridTile(
-//       footer: Material(
-//         color: Colors.transparent,
-//         shape: const RoundedRectangleBorder(
-//           borderRadius: BorderRadius.vertical(bottom: Radius.circular(4)),
-//         ),
-//         clipBehavior: Clip.antiAlias,
-//         child: GridTileBar(
-//           backgroundColor: Colors.black45,
-//           title: _GridTitleText(photo.title),
-//           subtitle: _GridTitleText(photo.subtitle),
-//         ),
-//       ),
-//       child: image,
-//     );
-//   }
-// }
+    return GridTile(
+      footer: Material(
+        color: Colors.transparent,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(4)),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: GridTileBar(
+          backgroundColor: Colors.black45,
+          title: _GridTitleText(boardgameItem.boardgame.name),
+          // subtitle: _GridTitleText(photo.subtitle),
+        ),
+      ),
+      child: image,
+    );
+  }
+}
