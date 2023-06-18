@@ -1,4 +1,5 @@
 import 'package:amplify_api/amplify_api.dart';
+import 'package:app/helpers/hero_popup_router.dart';
 import 'package:app/models/BoardGame.dart';
 import 'package:app/models/BoardGameType.dart';
 import 'package:app/widgets/appBar.dart';
@@ -15,7 +16,7 @@ class BoardGamesScreen extends StatefulWidget {
 }
 
 class _BoardGamesScreenState extends State<BoardGamesScreen> {
-  var _boardgames = <BoardGame>[];
+  var _boardGames = <BoardGame>[];
 
   bool _showSubmitForm = false;
 
@@ -50,7 +51,7 @@ class _BoardGamesScreenState extends State<BoardGamesScreen> {
   }
 
   Future<void> _fetchBoardGames() async {
-    safePrint('Getting boardgames');
+    safePrint('Getting board games');
 
     // if a user's login state has not been determined at least once,
     // explitly check it and wait for response
@@ -75,10 +76,10 @@ class _BoardGamesScreenState extends State<BoardGamesScreen> {
         return;
       }
       if (games!.isEmpty) {
-        safePrint('no boardgames yet');
+        safePrint('no board games yet');
       }
       setState(() {
-        _boardgames = games!.whereType<BoardGame>().toList();
+        _boardGames = games!.whereType<BoardGame>().toList();
       });
     } on ApiException catch (e) {
       safePrint('Query failed: $e');
@@ -87,11 +88,11 @@ class _BoardGamesScreenState extends State<BoardGamesScreen> {
 
   List<_BoardGameItem> _boardGameItems() {
     var counter = 0;
-    List<_BoardGameItem> modifiedList = _boardgames.map((game) {
+    List<_BoardGameItem> modifiedList = _boardGames.map((game) {
       var assetName =
-          'lib/assets/local_tests/boardgame_image/${counter % 5}.jpg';
+          'lib/assets/local_tests/board_game_image/${counter % 5}.jpg';
       counter++;
-      return _BoardGameItem(boardgame: game, assetName: assetName);
+      return _BoardGameItem(boardGame: game, assetName: assetName);
     }).toList();
     return modifiedList;
   }
@@ -99,7 +100,7 @@ class _BoardGamesScreenState extends State<BoardGamesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: const MyAppBar(title: 'Boardgames'),
+        appBar: const MyAppBar(title: 'Board games'),
         floatingActionButton: _userIsSignedIn
             ? FloatingActionButton(
                 onPressed: () {
@@ -126,7 +127,7 @@ class _BoardGamesScreenState extends State<BoardGamesScreen> {
               childAspectRatio: 1,
               children: _boardGameItems().map<Widget>((game) {
                 return _GridDemoPhotoItem(
-                  boardgameItem: game,
+                  boardGameItem: game,
                   // tileStyle: type,
                 );
               }).toList(),
@@ -160,7 +161,7 @@ class _SubmitFormState extends State<_SubmitForm> {
       TextEditingController();
 
 // controllers don't work with dropdown fields
-  BoardGameType? _boardgameType;
+  BoardGameType? _boardGameType;
 
   @override
   void dispose() {
@@ -192,7 +193,7 @@ class _SubmitFormState extends State<_SubmitForm> {
         int.parse(_minimumNumberOfPlayersController.text);
     final minimumDuration = int.parse(_minimumDurationController.text);
     final BoardGameType type =
-        _boardgameType!; //it cannot be null due to form validation
+        _boardGameType!; //it cannot be null due to form validation
     final maximumNumberOfPlayers =
         int.parse(_maximumNumberOfPlayersController.text);
     final maximumDuration = int.parse(_maximumDurationController.text);
@@ -236,7 +237,7 @@ class _SubmitFormState extends State<_SubmitForm> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Add boardgame',
+              'Add board game',
               style: TextStyle(
                 fontSize: 20.0,
                 fontWeight: FontWeight.bold,
@@ -300,10 +301,10 @@ class _SubmitFormState extends State<_SubmitForm> {
               keyboardType: TextInputType.number,
             ),
             DropdownButtonFormField<BoardGameType>(
-              value: _boardgameType,
+              value: _boardGameType,
               onChanged: (BoardGameType? newValue) {
                 setState(() {
-                  _boardgameType = newValue;
+                  _boardGameType = newValue;
                 });
               },
               validator: (value) {
@@ -312,7 +313,8 @@ class _SubmitFormState extends State<_SubmitForm> {
                 }
                 return null;
               },
-              decoration: const InputDecoration(labelText: 'Type of boardgame'),
+              decoration:
+                  const InputDecoration(labelText: 'Type of board game'),
               items: BoardGameType.values.map((type) {
                 return DropdownMenuItem<BoardGameType>(
                   value: type,
@@ -333,9 +335,9 @@ class _SubmitFormState extends State<_SubmitForm> {
 }
 
 class _BoardGameItem {
-  _BoardGameItem({required this.boardgame, required this.assetName});
+  _BoardGameItem({required this.boardGame, required this.assetName});
 
-  final BoardGame boardgame;
+  final BoardGame boardGame;
   final String assetName;
 }
 
@@ -357,40 +359,153 @@ class _GridTitleText extends StatelessWidget {
 
 class _GridDemoPhotoItem extends StatelessWidget {
   const _GridDemoPhotoItem({
-    required this.boardgameItem,
+    required this.boardGameItem,
   });
 
-  final _BoardGameItem boardgameItem;
+  final _BoardGameItem boardGameItem;
 
   @override
   Widget build(BuildContext context) {
     final Widget image = Semantics(
-      label: boardgameItem.boardgame.name,
+      label: boardGameItem.boardGame.name,
       child: Material(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
         clipBehavior: Clip.antiAlias,
         child: Image.asset(
-          boardgameItem.assetName,
+          boardGameItem.assetName,
           // package: 'flutter_gallery_assets',
           fit: BoxFit.cover,
         ),
       ),
     );
 
-    return GridTile(
-      footer: Material(
-        color: Colors.transparent,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(4)),
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          HeroPopupRoute(
+            builder: (context) => Center(
+              child: _BoardGameCard(boardGameItem: boardGameItem),
+            ),
+          ),
+        );
+      },
+      child: GridTile(
+        footer: Material(
+          color: Colors.transparent,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(4)),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: GridTileBar(
+            backgroundColor: Colors.black45,
+            title: _GridTitleText(boardGameItem.boardGame.name),
+            // subtitle: _GridTitleText(photo.subtitle),
+          ),
         ),
-        clipBehavior: Clip.antiAlias,
-        child: GridTileBar(
-          backgroundColor: Colors.black45,
-          title: _GridTitleText(boardgameItem.boardgame.name),
-          // subtitle: _GridTitleText(photo.subtitle),
+        child: image,
+      ),
+    );
+  }
+}
+
+class _BoardGameCard extends StatelessWidget {
+  const _BoardGameCard({required this.boardGameItem});
+
+  final _BoardGameItem boardGameItem;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: Hero(
+          tag: boardGameItem.boardGame.id,
+          child: SingleChildScrollView(
+            child: Card(
+              color: Colors.white,
+              elevation: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 300,
+                      height: 300,
+                      child: Image.asset(
+                        boardGameItem.assetName,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              boardGameItem.boardGame.name,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              boardGameItem.boardGame.description,
+                              style: const TextStyle(
+                                fontSize: 14,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                const Icon(Icons.people),
+                                const SizedBox(width: 4),
+                                Text(
+                                    '${boardGameItem.boardGame.minimumNumberOfPlayers} players'),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                const Icon(Icons.timer),
+                                const SizedBox(width: 4),
+                                Text(
+                                    '${boardGameItem.boardGame.minimumDuration} min'),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                const Icon(Icons.category),
+                                const SizedBox(width: 4),
+                                Text(boardGameItem.boardGame.type.toString()),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    // Expanded(
+                    //   // child: Container(
+                    //   //   width: 100,
+                    //   //   height: 100,
+                    //   //   color: Colors.green,
+                    //   child: Column(
+                    //     children: [
+                    //       Text('Column Item 1'),
+                    //       Text('Column Item 2'),
+                    //     ],
+                    //     // ),
+                    //   ),
+                    // ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ),
       ),
-      child: image,
     );
   }
 }
