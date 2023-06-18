@@ -13,7 +13,8 @@
     },
     "categories": {
       "auth": {
-        "hex5dfb724f": {}
+        "hex5dfb724f": {},
+        "userPoolGroups": {}
       },
       "api": {
         "hex": {}

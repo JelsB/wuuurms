@@ -316,3 +316,7 @@ amplify auth update
 ✔ Sort the user pool groups in order of preference · admin
 ```
 This add `userPoolGroups` to the `backend-config.json` file. Add `userPoolGroupList` to the `cli-inputs.json` file and creates a new file with `user-pool-group-precedence.json` which now only contains this new user group pool: `admin`.
+
+`amplify push` applies the changes with Cfn and adds `userPoolGroups` to the authorisation categories in `team-provider-info.json`. PLus add the adminGroupRole to dependencies when building the backend via amplify in the `amplify-dependent-resources-ref.d.ts`.
+
+Next, manually add a user to the `admin` group in the Console in Cognito.
