@@ -300,3 +300,19 @@ The hardest part is still making goor adaptive widget when screen sizes change. 
 > **What have I learnt?** 
 > - `Hero` widgets are a cool and easy to use concept. They can be an alternative to `Stack`ed widgets.
 > - Enum extensions are a cool feature in Dart!
+
+## Only allow admins to add board games
+This needs a new Cognito User Pool group and the permissions need to change in the model.
+
+```
+amplify auth update
+? What do you want to do?
+  Apply default configuration with Social Provider (Federation)
+  Walkthrough all the auth configurations
+❯ Create or update Cognito user pool groups
+? Provide a name for your user pool group: admin
+? Do you want to add another User Pool Group - No
+? Sort the user pool groups in order of preference …  (Use <shift>+<right/left> to change the order)
+✔ Sort the user pool groups in order of preference · admin
+```
+This add `userPoolGroups` to the `backend-config.json` file. Add `userPoolGroupList` to the `cli-inputs.json` file and creates a new file with `user-pool-group-precedence.json` which now only contains this new user group pool: `admin`.
