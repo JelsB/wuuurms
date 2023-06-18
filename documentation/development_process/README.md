@@ -289,3 +289,14 @@ flutter:
 > - To use local assets, you need to add them to `pubspec.yaml`. It only adds assets in the root of the specified directory. When using a directory, you need to end in `/`.
 > - To have widgets which can overlay on each other, you can use the `Stack` widget. This was very useful to display the form widget when clicking the floating button.
 > - To have control over adaptive layouts such a numner of columns in a grid, you need to wrap your widget in `LayoutBuilder`. This has information about the contraints of the device that is used like the maximum screen width. You can/should then use this to calcultate the number of columns based on the width of your item.
+
+### Create Pop-up with board game details when clicking on it
+Make a pop-up appear when clicking on one of the board game tiles. It will display all details of the board game.
+
+I have tried several ways to create a widget that appears on top of the grid when cliking it. One way was to use a Stack and a statemanegent variable, similar to the submission form. But is seems like `Hero` widgets are the better solution for this. They basically create a new screen. This looked more future proof than handling state for N number of board games. I borrowed inspiration for this of from [this video](https://www.youtube.com/watch?v=Bxs8Zy2O4wk) and [code example](https://github.com/funwithflutter/flutter_ui_tips). It creates a custom Router, but the implementation is no too complex. Using `Hero` widgets is pretty straightforward.
+
+The hardest part is still making goor adaptive widget when screen sizes change. I was unable to make the content of the pop-up card wrap correctly when the screen got too small. I tried several combinations of `Wrap`, `Expaneded`, `Row` and `Column`. The problem seems to arise when using `Exapended` and nested `Column`s and `Row`s inside a `Wrap`. I will revisit this, and most likely solve it with `LayoutBuilder`.
+
+> **What have I learnt?** 
+> - `Hero` widgets are a cool and easy to use concept. They can be an alternative to `Stack`ed widgets.
+> - Enum extensions are a cool feature in Dart!
