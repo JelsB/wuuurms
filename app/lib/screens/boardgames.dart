@@ -1,4 +1,7 @@
+import 'dart:js_interop';
+
 import 'package:amplify_api/amplify_api.dart';
+import 'package:app/helpers/enum_extension.dart';
 import 'package:app/helpers/hero_popup_router.dart';
 import 'package:app/models/BoardGame.dart';
 import 'package:app/models/BoardGameType.dart';
@@ -413,6 +416,32 @@ class _BoardGameCard extends StatelessWidget {
 
   final _BoardGameItem boardGameItem;
 
+  String get _playerRangeAsString {
+    var minimumNumberOfPlayers = boardGameItem.boardGame.minimumNumberOfPlayers;
+    var maximumNumberOfPlayers = boardGameItem.boardGame.maximumNumberOfPlayers;
+
+    var potentialMaximumNumberOfPlayers =
+        maximumNumberOfPlayers.isDefinedAndNotNull
+            ? '- $maximumNumberOfPlayers'
+            : '';
+
+    return '$minimumNumberOfPlayers $potentialMaximumNumberOfPlayers players';
+  }
+
+  String get _durationAsString {
+    var minimumDuration = boardGameItem.boardGame.minimumDuration;
+    var maximumDuration = boardGameItem.boardGame.maximumDuration;
+
+    var potentialMaximumDuration =
+        maximumDuration.isDefinedAndNotNull ? '- $maximumDuration' : '';
+
+    return '$minimumDuration $potentialMaximumDuration min';
+  }
+
+  String get _boardGameTypeAsString {
+    return boardGameItem.boardGame.type.displayValue;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -461,8 +490,7 @@ class _BoardGameCard extends StatelessWidget {
                               children: [
                                 const Icon(Icons.people),
                                 const SizedBox(width: 4),
-                                Text(
-                                    '${boardGameItem.boardGame.minimumNumberOfPlayers} players'),
+                                Text(_playerRangeAsString),
                               ],
                             ),
                             const SizedBox(height: 4),
@@ -470,8 +498,7 @@ class _BoardGameCard extends StatelessWidget {
                               children: [
                                 const Icon(Icons.timer),
                                 const SizedBox(width: 4),
-                                Text(
-                                    '${boardGameItem.boardGame.minimumDuration} min'),
+                                Text(_durationAsString),
                               ],
                             ),
                             const SizedBox(height: 4),
@@ -479,26 +506,13 @@ class _BoardGameCard extends StatelessWidget {
                               children: [
                                 const Icon(Icons.category),
                                 const SizedBox(width: 4),
-                                Text(boardGameItem.boardGame.type.toString()),
+                                Text(_boardGameTypeAsString),
                               ],
                             ),
                           ],
                         ),
                       ),
                     ),
-                    // Expanded(
-                    //   // child: Container(
-                    //   //   width: 100,
-                    //   //   height: 100,
-                    //   //   color: Colors.green,
-                    //   child: Column(
-                    //     children: [
-                    //       Text('Column Item 1'),
-                    //       Text('Column Item 2'),
-                    //     ],
-                    //     // ),
-                    //   ),
-                    // ),
                   ],
                 ),
               ),
