@@ -210,7 +210,7 @@ Goal is to display public access to list of boardgames. A few different approach
    ```dart
    final request = ModelQueries.list(BoardGame.classType,
           authorizationMode: APIAuthorizationType.iam);
-      final response = await Amplify.API.query(request: request).response;
+   final response = await Amplify.API.query(request: request).response;
    ```
 ### Not working solution 
 - Following the Amplify [docs to add guest access](https://docs.amplify.aws/lib/auth/guest_access/q/platform/flutter/), I ended up with the following configuration:
@@ -259,3 +259,33 @@ Goals is to allow admin users to add boardgames.
 > - Use `setState()` inside methods when updating state like private variables.
 > - using the `late` identifier is not good when dealing with state widgets because
 > the variable needs to be initialised before the widget is built (if it uses the variable)
+
+## Beautify UI
+Goals:
+1. Make app bar dynamic based on the page you are
+2. Improve how the grid of boardgames looks like
+### Dynamic app bar
+Abstracting the app bar into its own widget is pretty straightforward. This widget can have a default layout which can change based on input parameters pass to the constructor when used in other widgets. Currently it's only allow to add more actions when using this app bar widget.
+> **What have I learnt?** 
+> - The actions on an app bar don't collaps when reducing the window size. I expected it to become a hamburger menu when the screen got smaller.
+> - The actions on an app bar don't change how their are displayed based on the platform. I expected it to become a hamburger menu on phone.
+> - a Drawer widget is most likely better to use for navigation.
+> - To differentiate between platforms, you need to do this explicitly inside widgets. See [docs](https://docs.flutter.dev/ui/layout/building-adaptive-apps#device-segmentation)
+
+### Adaptive grid with images
+The screen should look like a grid of image with the title of the game. Temporary goal is to use local image assets and not yet images uploade by a user and stored in S3. The grid should be adaptive when changing the screen size. 
+
+For such a more complex layout, you need to create small modular widget classes.
+Adding local assets needs changes in the `pubspec.yaml` file:
+```yaml
+flutter:
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - lib/assets/local_tests/boardgame_image/
+```
+
+> **What have I learnt?** 
+> - To use local assets, you need to add them to `pubspec.yaml`. It only adds assets in the root of the specified directory. When using a directory, you need to end in `/`.
+> - To have widgets which can overlay on each other, you can use the `Stack` widget. This was very useful to display the form widget when clicking the floating button.
+> - To have control over adaptive layouts such a numner of columns in a grid, you need to wrap your widget in `LayoutBuilder`. This has information about the contraints of the device that is used like the maximum screen width. You can/should then use this to calcultate the number of columns based on the width of your item.
