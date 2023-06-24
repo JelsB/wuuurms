@@ -320,3 +320,7 @@ This add `userPoolGroups` to the `backend-config.json` file. Add `userPoolGroupL
 `amplify push` applies the changes with Cfn and adds `userPoolGroups` to the authorisation categories in `team-provider-info.json`. PLus add the adminGroupRole to dependencies when building the backend via amplify in the `amplify-dependent-resources-ref.d.ts`.
 
 Next, manually add a user to the `admin` group in the Console in Cognito.
+
+## Allow users to log out
+
+I wanted to add a log out button to easily switch users to test auth settings on the GraphQL api. I first wanted to add this to the app bar, but this meant it needed to become a stateful widget and know about the user login status. This meant the two widgets were already managing user loging state. Not great... I was finally time to do some proper shared state management. Luckily, the [Flutter documentation](https://docs.flutter.dev/data-and-backend/state-mgmt/intro) helped.
