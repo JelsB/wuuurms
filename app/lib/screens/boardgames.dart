@@ -1,5 +1,3 @@
-import 'dart:js_interop';
-
 import 'package:amplify_api/amplify_api.dart';
 import 'package:app/helpers/enum_extension.dart';
 import 'package:app/helpers/hero_popup_router.dart';
@@ -421,9 +419,7 @@ class _BoardGameCard extends StatelessWidget {
     var maximumNumberOfPlayers = boardGameItem.boardGame.maximumNumberOfPlayers;
 
     var potentialMaximumNumberOfPlayers =
-        maximumNumberOfPlayers.isDefinedAndNotNull
-            ? '- $maximumNumberOfPlayers'
-            : '';
+        maximumNumberOfPlayers != null ? '- $maximumNumberOfPlayers' : '';
 
     return '$minimumNumberOfPlayers $potentialMaximumNumberOfPlayers players';
   }
@@ -433,7 +429,7 @@ class _BoardGameCard extends StatelessWidget {
     var maximumDuration = boardGameItem.boardGame.maximumDuration;
 
     var potentialMaximumDuration =
-        maximumDuration.isDefinedAndNotNull ? '- $maximumDuration' : '';
+        maximumDuration != null ? '- $maximumDuration' : '';
 
     return '$minimumDuration $potentialMaximumDuration min';
   }
