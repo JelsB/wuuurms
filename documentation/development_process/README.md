@@ -324,3 +324,207 @@ Next, manually add a user to the `admin` group in the Console in Cognito.
 ## Allow users to log out
 
 I wanted to add a log out button to easily switch users to test auth settings on the GraphQL api. I first wanted to add this to the app bar, but this meant it needed to become a stateful widget and know about the user login status. This meant the two widgets were already managing user loging state. Not great... I was finally time to do some proper shared state management. Luckily, the [Flutter documentation](https://docs.flutter.dev/data-and-backend/state-mgmt/intro) helped.
+
+### Attempt 1
+
+```dart
+class MyApp extends StatelessWidget {
+  late bool initUserLoginState;
+
+  MyApp({super.key}) {
+    _getInitialUserLoginState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Authenticator(
+      child: ChangeNotifierProvider(
+        create: (context) => UserLoginStateModel(widget.initUserLoginState),
+        child: MaterialApp.router(
+          // routeInformationParser: router.routeInformationParser,
+          // routerDelegate: router.routerDelegate,
+          routerConfig: router,
+          // debugShowCheckedModeBanner: false,
+          // builder: Authenticator.builder(), //NOTE: does not work with partial authenticated screens
+        ),
+      ),
+    );
+  }
+
+  Future<void> _getInitialUserLoginState() async {
+    initUserLoginState = await UserLoginStateModel.isUserSignedIn();
+  }
+}
+```
+
+```dart
+class UserLoginStateModel extends ChangeNotifier {
+   bool loggedIn = false;
+
+
+  static Future<bool> _isUserSignedIn() async {
+    try {
+      final result = await Amplify.Auth.fetchAuthSession();
+      safePrint('User is signed in: ${result.isSignedIn}');
+      return result.isSignedIn;
+    } on AuthException catch (e) {
+      safePrint('Error retrieving auth session: ${e.message}');
+      return false;
+    }
+  }
+
+  void changeTo(bool newLoginState) {
+    loggedIn = newLoginState;
+    notifyListeners();
+  }
+
+}
+
+```
+but then the app needed to turn into a stateful widget. And I don't need that. It just needs to be called once.
+
+### Attempt 2
+```dart
+class UserLoginStateModel extends ChangeNotifier {
+  late bool loggedIn;
+
+  UserLoginStateModel() {
+    _getInitialUserLoginState();
+  }
+
+  static Future<bool> _isUserSignedIn() async {
+    try {
+      final result = await Amplify.Auth.fetchAuthSession();
+      safePrint('User is signed in: ${result.isSignedIn}');
+      return result.isSignedIn;
+    } on AuthException catch (e) {
+      safePrint('Error retrieving auth session: ${e.message}');
+      return false;
+    }
+  }
+
+  void changeTo(bool newLoginState) {
+    loggedIn = newLoginState;
+    notifyListeners();
+  }
+
+  Future<void> _getInitialUserLoginState() async {
+    loggedIn = await _isUserSignedIn();
+  }
+}
+
+```
+This works but the state `loggedIn` is not updated by the `Authenticator` class
+
+### Attempt 3 
+Extends attempt 2 by updating the `UserLoginStateModel` state via after a user is logged in/out. I could not find a way to call a method after log in/out succeeded. I did not manage to override the `Authenticator` or `AuthenticatedView` to do this either.
+#### Option 1
+Call `changeTo(true)` when calling `initState()` of view which is behind `AuthenticatedView`.
+```dart
+@override
+  void initState() {
+    super.initState();
+    //When getting to this page, it means that the use has logged in because
+    // it's and authenticated view. Ideally, this would be set on the
+    // authenticatedView Widget, but I don't know how
+    Provider.of<UserLoginStateModel>(context, listen: false).changeTo(true);
+  }
+```
+This did kind of work. But resulted in exceptions like;
+```The following assertion was thrown while dispatching notifications for
+UserLoginStateModel:
+setState() or markNeedsBuild() called during build.
+This _InheritedProviderScope<UserLoginStateModel?> widget cannot be marked as
+needing to build
+because the framework is already in the process of building widgets. A widget
+can be marked as
+needing to be built during the build phase only if one of its ancestors is
+currently building. This
+exception is allowed because the framework builds parent widgets before
+children, which means a
+dirty descendant will always be built. Otherwise, the framework might not
+visit this widget during
+this build phase.
+The widget on which setState() or markNeedsBuild() was called was:
+  _InheritedProviderScope<UserLoginStateModel?>
+The widget which was currently being built when the offending call was made
+was:
+  Directionality
+```
+```
+Another exception was thrown: setState() or markNeedsBuild() called during build.
+Another exception was thrown: setState() or markNeedsBuild() called during build.
+```
+#### Option 2
+Listen for Cognito Auth events. [See docs](https://docs.amplify.aws/lib/auth/auth-events/q/platform/flutter/).
+```dart
+import 'dart:async';
+
+import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:flutter/material.dart';
+
+class UserLoginStateModel extends ChangeNotifier {
+  bool loggedIn = false;
+  StreamSubscription<AuthHubEvent>? subscription;
+
+  UserLoginStateModel() {
+    _getInitialUserLoginState();
+    _listenToAuthenticationEvent();
+  }
+
+  static Future<bool> _isUserSignedIn() async {
+    try {
+      final result = await Amplify.Auth.fetchAuthSession();
+      safePrint('User is signed in: ${result.isSignedIn}');
+      return result.isSignedIn;
+    } on AuthException catch (e) {
+      safePrint('Error retrieving auth session: ${e.message}');
+      return false;
+    }
+  }
+
+  void changeTo(bool newLoginState) {
+    loggedIn = newLoginState;
+    notifyListeners();
+  }
+
+  Future<void> _getInitialUserLoginState() async {
+    loggedIn = await _isUserSignedIn();
+  }
+
+  void _listenToAuthenticationEvent() {
+    subscription = Amplify.Hub.listen(HubChannel.Auth, (AuthHubEvent event) {
+      switch (event.type) {
+        case AuthHubEventType.signedIn:
+          safePrint('User is signed in.');
+          changeTo(true);
+          break;
+        case AuthHubEventType.signedOut:
+          safePrint('User is signed out.');
+          changeTo(false);
+          break;
+        case AuthHubEventType.sessionExpired:
+          safePrint('The session has expired.');
+          break;
+        case AuthHubEventType.userDeleted:
+          safePrint('The user has been deleted.');
+          break;
+      }
+    });
+  }
+}
+```
+This works! Note that the `subscription` could not be created at initialisation because it could not access `changeTo` because that did not yet exist.
+
+There is still one leftover error. Somewhere a global key of a widget is duplicated.
+```
+Multiple widgets used the same GlobalKey.
+The key [LabeledGlobalKey<ScaffoldMessengerState>#6b8af] was used by multiple widgets. The parents
+of those widgets were different widgets that both had the following description:
+  Directionality(textDirection: ltr)
+A GlobalKey can only be specified on one widget at a time in the widget tree.
+```
+
+
+> **What have I learnt?** 
+> - TODO

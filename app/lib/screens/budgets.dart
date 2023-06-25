@@ -4,6 +4,9 @@ import 'package:app/models/BudgetEntry.dart';
 import 'package:app/widgets/appBar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+import '../models/user_login_state.dart';
 
 class BudgetsScreen extends StatefulWidget {
   const BudgetsScreen({super.key});
@@ -18,6 +21,10 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
   @override
   void initState() {
     super.initState();
+    //When getting to this page, it means that the use has logged in because
+    // it's and authenticated view. Ideally, this would be set on the
+    // authenticatedView Widget, but I don't know how
+    // Provider.of<UserLoginStateModel>(context, listen: false).changeTo(true);
     _refreshBudgetEntries();
   }
 

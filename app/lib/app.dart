@@ -3,9 +3,11 @@ import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_authenticator/amplify_authenticator.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'amplifyconfiguration.dart';
 import 'models/ModelProvider.dart';
+import 'models/user_login_state.dart';
 import 'routes.dart';
 
 Future<void> configureAmplify() async {
@@ -35,12 +37,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Authenticator(
-      child: MaterialApp.router(
-        // routeInformationParser: router.routeInformationParser,
-        // routerDelegate: router.routerDelegate,
-        routerConfig: router,
-        // debugShowCheckedModeBanner: false,
-        // builder: Authenticator.builder(), //NOTE: does not work with partial authenticated screens
+      child: ChangeNotifierProvider(
+        create: (context) => UserLoginStateModel(),
+        child: MaterialApp.router(
+          // routeInformationParser: router.routeInformationParser,
+          // routerDelegate: router.routerDelegate,
+          routerConfig: router,
+          debugShowCheckedModeBanner: false,
+          // builder: Authenticator.builder(), //NOTE: does not work with partial authenticated screens
+        ),
       ),
     );
   }

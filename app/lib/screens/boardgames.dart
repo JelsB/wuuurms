@@ -6,6 +6,9 @@ import 'package:app/models/BoardGameType.dart';
 import 'package:app/widgets/appBar.dart';
 import 'package:flutter/material.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:provider/provider.dart';
+
+import '../models/user_login_state.dart';
 
 class BoardGamesScreen extends StatefulWidget {
   const BoardGamesScreen({
@@ -21,37 +24,32 @@ class _BoardGamesScreenState extends State<BoardGamesScreen> {
 
   bool _showSubmitForm = false;
 
-  bool _userIsSignedIn = false;
+  // bool _userIsSignedIn = false;
 
   /// Indicates if user login state has been checked explicitly
   ///
   /// This is useful to avoid relying on asyn operations to check this
-  bool _initialCheckIfUserIsSignedInIsDone = false;
+  // bool _initialCheckIfUserIsSignedInIsDone = false;
 
   @override
   void initState() {
     super.initState();
-    _checkIfUserIsSignedIn();
-    _fetchBoardGames();
+    // _checkIfUserIsSignedIn();
+    var userIsLoggedIn =
+        Provider.of<UserLoginStateModel>(context, listen: false).loggedIn;
+    _fetchBoardGames(userIsLoggedIn);
   }
 
-  Future<void> _checkIfUserIsSignedIn() async {
-    var signedIn = false;
-    try {
-      final result = await Amplify.Auth.fetchAuthSession();
-      safePrint('User is signed in: ${result.isSignedIn}');
-      signedIn = result.isSignedIn;
-    } on AuthException catch (e) {
-      safePrint('Error retrieving auth session: ${e.message}');
-    }
+  // Future<void> _checkIfUserIsSignedIn() async {
+  //   var signedIn = await isUserSignedIn();
 
-    setState(() {
-      _userIsSignedIn = signedIn;
-      _initialCheckIfUserIsSignedInIsDone = true;
-    });
-  }
+  //   setState(() {
+  //     // _userIsSignedIn = signedIn;
+  //     _initialCheckIfUserIsSignedInIsDone = true;
+  //   });
+  // }
 
-  Future<void> _fetchBoardGames() async {
+  Future<void> _fetchBoardGames(bool userIsSignedIn) async {
     safePrint('Getting board games');
 
     // if a user's login state has not been determined at least once,
@@ -60,12 +58,12 @@ class _BoardGamesScreenState extends State<BoardGamesScreen> {
     // but the `_userIsSignedIn` is not updated yet.
     // In the future, this could be avoided with global state
     // management in this app.
-    if (!_initialCheckIfUserIsSignedInIsDone) {
-      await _checkIfUserIsSignedIn();
-    }
+    // if (!_initialCheckIfUserIsSignedInIsDone) {
+    //   await _checkIfUserIsSignedIn();
+    // }
 
     final request = ModelQueries.list(BoardGame.classType,
-        authorizationMode: _userIsSignedIn
+        authorizationMode: userIsSignedIn
             ? APIAuthorizationType.userPools
             : APIAuthorizationType.iam);
     try {
@@ -100,49 +98,53 @@ class _BoardGamesScreenState extends State<BoardGamesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: const MyAppBar(title: 'Board games'),
-        floatingActionButton: _userIsSignedIn
-            ? FloatingActionButton(
-                onPressed: () {
-                  setState(() {
-                    _showSubmitForm = !_showSubmitForm;
-                  });
-                },
-                child: Icon(_showSubmitForm ? Icons.close : Icons.add),
-              )
-            : null,
-        body: Stack(children: [
-          LayoutBuilder(builder: (context, constraints) {
-            // Calculate the number of columns based on the available width
-            double screenWidth = constraints.maxWidth;
-            int columnsCount = (screenWidth ~/ 300).clamp(1,
-                6); // Adjust the item width (200) and the maximum number of columns (4)
+    return Consumer<UserLoginStateModel>(
+        builder: (context, userLoginState, child) {
+      return Scaffold(
+          appBar: const MyAppBar(title: 'Board games'),
+          floatingActionButton: userLoginState.loggedIn
+              ? FloatingActionButton(
+                  onPressed: () {
+                    setState(() {
+                      _showSubmitForm = !_showSubmitForm;
+                    });
+                  },
+                  child: Icon(_showSubmitForm ? Icons.close : Icons.add),
+                )
+              : null,
+          body: Stack(children: [
+            LayoutBuilder(builder: (context, constraints) {
+              // Calculate the number of columns based on the available width
+              double screenWidth = constraints.maxWidth;
+              int columnsCount = (screenWidth ~/ 300).clamp(1,
+                  6); // Adjust the item width (200) and the maximum number of columns (4)
 
-            return GridView.count(
-              restorationId: 'grid_view_demo_grid_offset',
-              crossAxisCount: columnsCount,
-              mainAxisSpacing: 20,
-              crossAxisSpacing: 20,
-              padding: const EdgeInsets.all(20),
-              childAspectRatio: 1,
-              children: _boardGameItems().map<Widget>((game) {
-                return _GridDemoPhotoItem(
-                  boardGameItem: game,
-                  // tileStyle: type,
-                );
-              }).toList(),
-            );
-          }),
-          if (_showSubmitForm) _SubmitForm(_fetchBoardGames),
-        ]));
+              return GridView.count(
+                restorationId: 'grid_view_demo_grid_offset',
+                crossAxisCount: columnsCount,
+                mainAxisSpacing: 20,
+                crossAxisSpacing: 20,
+                padding: const EdgeInsets.all(20),
+                childAspectRatio: 1,
+                children: _boardGameItems().map<Widget>((game) {
+                  return _GridDemoPhotoItem(
+                    boardGameItem: game,
+                    // tileStyle: type,
+                  );
+                }).toList(),
+              );
+            }),
+            if (_showSubmitForm) _SubmitForm(_fetchBoardGames, userLoginState),
+          ]));
+    });
   }
 }
 
 class _SubmitForm extends StatefulWidget {
-  final Future<void> Function() toCallAfterSubmission;
+  final Future<void> Function(bool) toCallAfterSubmission;
+  final UserLoginStateModel userLoginState;
 
-  const _SubmitForm(this.toCallAfterSubmission);
+  const _SubmitForm(this.toCallAfterSubmission, this.userLoginState);
 
   @override
   _SubmitFormState createState() => _SubmitFormState();
@@ -213,7 +215,7 @@ class _SubmitFormState extends State<_SubmitForm> {
     final response = await Amplify.API.mutate(request: request).response;
     safePrint('Create result: $response');
 
-    widget.toCallAfterSubmission();
+    widget.toCallAfterSubmission(widget.userLoginState.loggedIn);
 
     // Reset the form after submission
     _formKey.currentState?.reset();
