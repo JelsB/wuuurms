@@ -416,6 +416,67 @@ class _BoardGameCard extends StatelessWidget {
 
   final _BoardGameItem boardGameItem;
 
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (context, constraints) {
+      double paddingWidth = constraints.maxWidth * 0.01;
+      double paddingHeigt = constraints.maxHeight * 0.30;
+
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+              vertical: paddingHeigt, horizontal: paddingWidth),
+          child: Hero(
+            tag: boardGameItem.boardGame.id,
+            child: Card(
+                color: Colors.white,
+                elevation: 2,
+                child: LayoutBuilder(builder: (context, constraints) {
+                  const double allPadding = 8;
+                  double maxWidthInclPadding =
+                      constraints.maxWidth - 2 * allPadding;
+                  double maxHeightInclPadding =
+                      constraints.maxHeight - 2 * allPadding;
+
+                  return Padding(
+                    padding: const EdgeInsets.all(allPadding),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: maxWidthInclPadding / 3,
+                          height: maxHeightInclPadding,
+                          child: Image.asset(
+                            boardGameItem.assetName,
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.topLeft,
+                          ),
+                        ),
+                        SizedBox(
+                          width: maxWidthInclPadding * 2 / 3,
+                          height: maxHeightInclPadding,
+                          child: _BoardGameDetails(
+                            boardGameItem: boardGameItem,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                })),
+          ),
+        ),
+      );
+    });
+  }
+}
+
+class _BoardGameDetails extends StatelessWidget {
+  const _BoardGameDetails({
+    super.key,
+    required this.boardGameItem,
+  });
+
+  final _BoardGameItem boardGameItem;
+
   String get _playerRangeAsString {
     var minimumNumberOfPlayers = boardGameItem.boardGame.minimumNumberOfPlayers;
     var maximumNumberOfPlayers = boardGameItem.boardGame.maximumNumberOfPlayers;
@@ -442,82 +503,56 @@ class _BoardGameCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Hero(
-          tag: boardGameItem.boardGame.id,
-          child: SingleChildScrollView(
-            child: Card(
-              color: Colors.white,
-              elevation: 2,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: 300,
-                      height: 300,
-                      child: Image.asset(
-                        boardGameItem.assetName,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              boardGameItem.boardGame.name,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              boardGameItem.boardGame.description,
-                              style: const TextStyle(
-                                fontSize: 14,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                const Icon(Icons.people),
-                                const SizedBox(width: 4),
-                                Text(_playerRangeAsString),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                const Icon(Icons.timer),
-                                const SizedBox(width: 4),
-                                Text(_durationAsString),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                const Icon(Icons.category),
-                                const SizedBox(width: 4),
-                                Text(_boardGameTypeAsString),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+    return ListView(
+      padding: const EdgeInsets.all(8),
+      children: <Widget>[
+        SizedBox(
+          height: 40,
+          child: Center(
+              child: Text(
+            boardGameItem.boardGame.name,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
+          )),
+        ),
+        SizedBox(
+          // height: 40, no height to allow lots of text.
+          child: Text(boardGameItem.boardGame.description),
+        ),
+        SizedBox(
+          height: 40,
+          // color: Colors.amber[100],
+          child: Row(
+            children: [
+              const Icon(Icons.people),
+              const SizedBox(width: 4),
+              Text(_playerRangeAsString),
+            ],
           ),
         ),
-      ),
+        SizedBox(
+          height: 40,
+          child: Row(
+            children: [
+              const Icon(Icons.timer),
+              const SizedBox(width: 4),
+              Text(_durationAsString),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 40,
+          child: Row(
+            children: [
+              const Icon(Icons.category),
+              const SizedBox(width: 4),
+              Text(_boardGameTypeAsString),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
