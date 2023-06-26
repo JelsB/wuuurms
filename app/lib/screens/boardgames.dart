@@ -3,7 +3,7 @@ import 'package:app/helpers/enum_extension.dart';
 import 'package:app/helpers/hero_popup_router.dart';
 import 'package:app/models/BoardGame.dart';
 import 'package:app/models/BoardGameType.dart';
-import 'package:app/widgets/appBar.dart';
+import 'package:app/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:provider/provider.dart';

@@ -1,7 +1,7 @@
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:app/models/BudgetEntry.dart';
-import 'package:app/widgets/appBar.dart';
+import 'package:app/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
