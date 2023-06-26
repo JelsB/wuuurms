@@ -528,3 +528,13 @@ A GlobalKey can only be specified on one widget at a time in the widget tree.
 
 > **What have I learnt?** 
 > - TODO
+
+### Fix adaptive layouts of pop-up with board game details
+Use `LayoutBuilder` for adaptive layouts.
+Replace nested widgets of `Row`, `Column`, `Wrap`, `Expanded` with more out-of-the-box widgets for lists and put inside constraint boxed with `SizedBox` based on information from `LayoutBuilder`.
+
+> **What have I learnt?** 
+> - Keep padding of parent into account when creating child widgets with specific sized based on the parent widget with `LayoutBuilder`
+> - `SizedBox` is useful to limit child widgets layouts
+> - `FittedBox` can als be useful for scaling widgets
+> - A widget does not have to look great on all platforms. Some layouts are less mobile friendly but look better on web. It will be better to create platform specific versions of a widget. E.g. mobile app prefer scrollable widgets which and web can have pop-ups or pages which look nicer.
