@@ -12,6 +12,7 @@ enum BoardGameType {
 
 type BoardGame @model @auth(rules: [
   { allow: public, operations: [read],  provider: iam},
+  { allow: private, operations: [read]},
   { allow: owner }
 ]) {
   id: ID!

@@ -538,3 +538,36 @@ Replace nested widgets of `Row`, `Column`, `Wrap`, `Expanded` with more out-of-t
 > - `SizedBox` is useful to limit child widgets layouts
 > - `FittedBox` can als be useful for scaling widgets
 > - A widget does not have to look great on all platforms. Some layouts are less mobile friendly but look better on web. It will be better to create platform specific versions of a widget. E.g. mobile app prefer scrollable widgets which and web can have pop-ups or pages which look nicer.
+
+
+## Fix: logged in users can only see their own board games
+This is the current authentication on the schema
+```
+type BoardGame @model @auth(rules: [
+  { allow: public, operations: [read],  provider: iam},
+  { allow: owner }
+]) {
+```
+It already allow that any one can fetch board games and owners can add/update/delete their own board games. However, when fetching the board games of a logged in users, it only returns the owner's boardgames.
+
+Changing this to
+```
+type BoardGame @model @auth(rules: [
+  { allow: public, operations: [read],  provider: iam},
+  { allow: private, operations: [read]},
+  { allow: owner }
+```
+works. Also run `amplify push` to update the backend.
+
+Note that we still need to actively choose between the auth method when a user is logged in or not
+```
+final request = ModelQueries.list(BoardGame.classType,
+        authorizationMode: userIsSignedIn
+            ? APIAuthorizationType.userPools
+            : APIAuthorizationType.iam);
+```
+Using IAM for all public data does not work with logged in users (throws autorisation error) For certain data fetching to work with logged in users and guests, all public schemas will need both.
+```
+{ allow: public, operations: [read],  provider: iam},
+{ allow: private, operations: [read]},
+```
