@@ -1,7 +1,5 @@
-import 'package:app/models/user_login_state.dart';
 import 'package:app/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({

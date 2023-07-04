@@ -571,3 +571,71 @@ Using IAM for all public data does not work with logged in users (throws autoris
 { allow: public, operations: [read],  provider: iam},
 { allow: private, operations: [read]},
 ```
+**Don't forget** to run `amplify codegen models after changing schemas. These models have built-in validation.
+
+## Continue: Only admins can add new board games
+Change authorisation on schema from
+
+```
+type BoardGame @model @auth(rules: [
+  { allow: public, operations: [read],  provider: iam},
+  { allow: private, operations: [read]},
+  { allow: owner }
+```
+to
+```
+type BoardGame @model @auth(rules: [
+  { allow: public, operations: [read],  provider: iam},
+  { allow: private, operations: [read]},
+  { allow: groups, groups: ["admin"]}
+```
+run:
+- `amplify codegen models` to update Flutter Models of BoardGame 
+- `amplify push` to update resolvers in the backend
+
+When a non-admin uses tries to create a new item, it returns an error as expected:
+```
+flutter: Create result: GraphQLResponse<BoardGame> error: [
+  {
+    "message": "Not Authorized to access createBoardGame on type Mutation",
+    "locations": [
+      {
+        "line": 1,
+        "column": 102
+      }
+    ],
+    "path": [
+      "createBoardGame"
+    ],
+    "errorType": "Unauthorized"
+  }
+]
+```
+
+> **What have I learnt?** 
+> - You need to run `amplify codegen models` after changing schemas. These models have built-in validation. If not, then old validation rules can still be applied. E.g. when changing from `owner` to `groups`, there was an validatin error that the `owner` field was `null`. This field was not necessary any more when switching to groups.
+
+## BUG: user is signed in at startup is incorrect. 
+It says user is signed in, even if this is not true. (Maybe because of multiple devices.)
+
+## BUG: Multiple widgets used the same GlobalKey
+```
+The following assertion was thrown while finalizing the widget tree:
+Duplicate GlobalKey detected in widget tree.
+The following GlobalKey was specified multiple times in the widget tree. This will lead to parts of
+the widget tree being truncated unexpectedly, because the second time a key is seen, the previous
+instance is moved to the new location. The key was:
+- [LabeledGlobalKey<ScaffoldMessengerState>#6a879]
+This was determined by noticing that after the widget with the above global key was moved out of its
+previous parent, that previous parent never updated during this frame, meaning that it either did
+not update at all or updated before the widget was moved, in either case implying that it still
+thinks that it should have a child with that global key.
+The specific parent that did not update after having one or more children forcibly removed due to
+GlobalKey reparenting is:
+- Directionality(textDirection: ltr)
+A GlobalKey can only be specified on one widget at a time in the widget tree.
+
+```
+
+## BUG: UserLoginState should be returned to default when user logs out
+This avoid sharing state between different users logging in and of of the same app.

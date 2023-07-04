@@ -241,9 +241,14 @@ class BoardGame extends Model {
           ModelOperation.READ
         ]),
       AuthRule(
-        authStrategy: AuthStrategy.OWNER,
-        ownerField: "owner",
-        identityClaim: "cognito:username",
+        authStrategy: AuthStrategy.PRIVATE,
+        operations: [
+          ModelOperation.READ
+        ]),
+      AuthRule(
+        authStrategy: AuthStrategy.GROUPS,
+        groupClaim: "cognito:groups",
+        groups: [ "admin" ],
         provider: AuthRuleProvider.USERPOOLS,
         operations: [
           ModelOperation.CREATE,

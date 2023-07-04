@@ -102,16 +102,17 @@ class _BoardGamesScreenState extends State<BoardGamesScreen> {
         builder: (context, userLoginState, child) {
       return Scaffold(
           appBar: const MyAppBar(title: 'Board games'),
-          floatingActionButton: userLoginState.loggedIn
-              ? FloatingActionButton(
-                  onPressed: () {
-                    setState(() {
-                      _showSubmitForm = !_showSubmitForm;
-                    });
-                  },
-                  child: Icon(_showSubmitForm ? Icons.close : Icons.add),
-                )
-              : null,
+          floatingActionButton:
+              (userLoginState.loggedIn && userLoginState.isAdmin)
+                  ? FloatingActionButton(
+                      onPressed: () {
+                        setState(() {
+                          _showSubmitForm = !_showSubmitForm;
+                        });
+                      },
+                      child: Icon(_showSubmitForm ? Icons.close : Icons.add),
+                    )
+                  : null,
           body: Stack(children: [
             LayoutBuilder(builder: (context, constraints) {
               // Calculate the number of columns based on the available width
