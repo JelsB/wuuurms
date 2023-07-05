@@ -102,44 +102,47 @@ class _BoardGamesScreenState extends State<BoardGamesScreen> {
     return Consumer<UserLoginStateModel>(
         builder: (context, userLoginState, child) {
       return Scaffold(
-          appBar: const MyAppBar(title: 'Board games'),
-          floatingActionButton:
-              (userLoginState.loggedIn && userLoginState.isAdmin)
-                  ? FloatingActionButton(
-                      onPressed: () {
-                        setState(() {
-                          _showSubmitForm = !_showSubmitForm;
-                        });
-                      },
-                      child: Icon(_showSubmitForm ? Icons.close : Icons.add),
-                    )
-                  : null,
-          body: Stack(children: [
-            LayoutBuilder(builder: (context, constraints) {
-              double screenWidth = constraints.maxWidth;
-              // 2 colums if mobile device otherwise
-              // Calculate the number of columns based on the available width
-              // Adjust the item width (200) and the maximum number of columns (4)
-              int columnsCount =
-                  isMobileDevice ? 2 : (screenWidth ~/ 300).clamp(1, 6);
-
-              return GridView.count(
-                restorationId: 'grid_view_demo_grid_offset',
-                crossAxisCount: columnsCount,
-                mainAxisSpacing: 20,
-                crossAxisSpacing: 20,
-                padding: const EdgeInsets.all(20),
-                childAspectRatio: 1,
-                children: _boardGameItems().map<Widget>((game) {
-                  return _GridDemoPhotoItem(
-                    boardGameItem: game,
-                    // tileStyle: type,
+        appBar: const MyAppBar(title: 'Board games'),
+        floatingActionButton: (userLoginState.loggedIn &&
+                userLoginState.isAdmin)
+            ? FloatingActionButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    HeroPopupRoute(
+                      builder: (context) => Center(
+                        child: _SubmitForm(_fetchBoardGames, userLoginState),
+                      ),
+                    ),
                   );
-                }).toList(),
+                },
+                // child: Icon(_showSubmitForm ? Icons.close : Icons.add),
+                child: const Icon(Icons.add),
+              )
+            : null,
+        body: LayoutBuilder(builder: (context, constraints) {
+          double screenWidth = constraints.maxWidth;
+          // 2 colums if mobile device otherwise
+          // Calculate the number of columns based on the available width
+          // Adjust the item width (200) and the maximum number of columns (4)
+          int columnsCount =
+              isMobileDevice ? 2 : (screenWidth ~/ 300).clamp(1, 6);
+
+          return GridView.count(
+            restorationId: 'grid_view_demo_grid_offset',
+            crossAxisCount: columnsCount,
+            mainAxisSpacing: 20,
+            crossAxisSpacing: 20,
+            padding: const EdgeInsets.all(20),
+            childAspectRatio: 1,
+            children: _boardGameItems().map<Widget>((game) {
+              return _GridDemoPhotoItem(
+                boardGameItem: game,
+                // tileStyle: type,
               );
-            }),
-            if (_showSubmitForm) _SubmitForm(_fetchBoardGames, userLoginState),
-          ]));
+            }).toList(),
+          );
+        }),
+      );
     });
   }
 }
@@ -235,109 +238,131 @@ class _SubmitFormState extends State<_SubmitForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.all(16.0),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Add board game',
-              style: TextStyle(
-                fontSize: 20.0,
-                fontWeight: FontWeight.bold,
+    return Scaffold(
+        appBar: const MyAppBar(
+          title: '',
+        ),
+        //NOTE: needed? You can use normal phone navigation to go back.
+        // floatingActionButton: FloatingActionButton(
+        //     onPressed: () {
+        //       Navigator.of(context).pop();
+        //     },
+        //     child: const Icon(Icons.cross)),
+        body: LayoutBuilder(builder: (context, constraints) {
+          double paddingWidth = constraints.maxWidth * 0.05;
+          double paddingHeigt = constraints.maxHeight * 0.05;
+
+          return Hero(
+            tag: 'submitForm',
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                    vertical: paddingHeigt, horizontal: paddingWidth),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Add board game',
+                        style: TextStyle(
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16.0),
+                      TextFormField(
+                        controller: _nameController,
+                        decoration: const InputDecoration(labelText: 'Name'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a name';
+                          }
+                          return null;
+                        },
+                      ),
+                      TextFormField(
+                        controller: _descriptionController,
+                        decoration:
+                            const InputDecoration(labelText: 'Description'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a description';
+                          }
+                          return null;
+                        },
+                      ),
+                      TextFormField(
+                        controller: _minimumNumberOfPlayersController,
+                        decoration: const InputDecoration(
+                            labelText: 'Minimum Number of Players'),
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter the minimum number of players';
+                          }
+                          return null;
+                        },
+                      ),
+                      TextFormField(
+                        controller: _maximumNumberOfPlayersController,
+                        decoration: const InputDecoration(
+                            labelText: 'Maximum Number of Players (Optional)'),
+                        keyboardType: TextInputType.number,
+                      ),
+                      TextFormField(
+                        controller: _minimumDurationController,
+                        decoration: const InputDecoration(
+                            labelText: 'Minimum Duration in minutes'),
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter the minimum duration';
+                          }
+                          return null;
+                        },
+                      ),
+                      TextFormField(
+                        controller: _maximumDurationController,
+                        decoration: const InputDecoration(
+                            labelText:
+                                'Maximum Duration in minutes (Optional)'),
+                        keyboardType: TextInputType.number,
+                      ),
+                      DropdownButtonFormField<BoardGameType>(
+                        value: _boardGameType,
+                        onChanged: (BoardGameType? newValue) {
+                          setState(() {
+                            _boardGameType = newValue;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null) {
+                            return 'Please select a type';
+                          }
+                          return null;
+                        },
+                        decoration: const InputDecoration(
+                            labelText: 'Type of board game'),
+                        items: BoardGameType.values.map((type) {
+                          return DropdownMenuItem<BoardGameType>(
+                            value: type,
+                            child: Text(type.toString().split('.').last),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 16.0),
+                      ElevatedButton(
+                        onPressed: submitForm,
+                        child: const Text('Submit'),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
-            const SizedBox(height: 16.0),
-            TextFormField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Name'),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a name';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(labelText: 'Description'),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a description';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              controller: _minimumNumberOfPlayersController,
-              decoration:
-                  const InputDecoration(labelText: 'Minimum Number of Players'),
-              keyboardType: TextInputType.number,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter the minimum number of players';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              controller: _maximumNumberOfPlayersController,
-              decoration: const InputDecoration(
-                  labelText: 'Maximum Number of Players (Optional)'),
-              keyboardType: TextInputType.number,
-            ),
-            TextFormField(
-              controller: _minimumDurationController,
-              decoration: const InputDecoration(
-                  labelText: 'Minimum Duration in minutes'),
-              keyboardType: TextInputType.number,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter the minimum duration';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              controller: _maximumDurationController,
-              decoration: const InputDecoration(
-                  labelText: 'Maximum Duration in minutes (Optional)'),
-              keyboardType: TextInputType.number,
-            ),
-            DropdownButtonFormField<BoardGameType>(
-              value: _boardGameType,
-              onChanged: (BoardGameType? newValue) {
-                setState(() {
-                  _boardGameType = newValue;
-                });
-              },
-              validator: (value) {
-                if (value == null) {
-                  return 'Please select a type';
-                }
-                return null;
-              },
-              decoration:
-                  const InputDecoration(labelText: 'Type of board game'),
-              items: BoardGameType.values.map((type) {
-                return DropdownMenuItem<BoardGameType>(
-                  value: type,
-                  child: Text(type.toString().split('.').last),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: submitForm,
-              child: const Text('Submit'),
-            ),
-          ],
-        ),
-      ),
-    );
+          );
+        }));
   }
 }
 
