@@ -1,4 +1,5 @@
 import 'package:amplify_api/amplify_api.dart';
+import 'package:app/helpers/device_segmentation.dart';
 import 'package:app/helpers/enum_extension.dart';
 import 'package:app/helpers/hero_popup_router.dart';
 import 'package:app/models/BoardGame.dart';
@@ -115,10 +116,12 @@ class _BoardGamesScreenState extends State<BoardGamesScreen> {
                   : null,
           body: Stack(children: [
             LayoutBuilder(builder: (context, constraints) {
-              // Calculate the number of columns based on the available width
               double screenWidth = constraints.maxWidth;
-              int columnsCount = (screenWidth ~/ 300).clamp(1,
-                  6); // Adjust the item width (200) and the maximum number of columns (4)
+              // 2 colums if mobile device otherwise
+              // Calculate the number of columns based on the available width
+              // Adjust the item width (200) and the maximum number of columns (4)
+              int columnsCount =
+                  isMobileDevice ? 2 : (screenWidth ~/ 300).clamp(1, 6);
 
               return GridView.count(
                 restorationId: 'grid_view_demo_grid_offset',
