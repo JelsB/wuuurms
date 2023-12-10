@@ -66,4 +66,4 @@ amplifytools.xcconfig
 #amplify-do-not-edit-end
 
 # custom
-lib/assets/local_tests/
+# lib/assets/local_tests/
