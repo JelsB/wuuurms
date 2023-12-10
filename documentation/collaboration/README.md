@@ -24,5 +24,6 @@ Other OS specific stuff.
 https://docs.flutter.dev/get-started/editor
 
 # Run
-## Local files
-Add `lib/amplifyconfiguration.dart` file
+1. Add `lib/amplifyconfiguration.dart` file
+2. `flutter pub get` to install dependencies
+3. `flutter run` to run the app

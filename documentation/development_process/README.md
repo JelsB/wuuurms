@@ -639,3 +639,9 @@ A GlobalKey can only be specified on one widget at a time in the widget tree.
 
 ## BUG: UserLoginState should be returned to default when user logs out
 This avoid sharing state between different users logging in and of of the same app.
+
+
+## Flutter 3 upgrade
+Default to new Material 3. UI might looks funky.
+- https://docs.flutter.dev/ui/design/material
+- https://blog.codemagic.io/migrating-a-flutter-app-to-material-3/
