@@ -26,7 +26,8 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
     return Consumer<UserLoginStateModel>(
         builder: (context, userLoginState, child) {
       return AppBar(
-        title: Text(title),
+        title: Text(title, style: const TextStyle(color: Colors.white)),
+        backgroundColor: Colors.deepPurple.shade600,
         actions: [
           ...additionalActions, // Spread the additional actions
           TextButton(
