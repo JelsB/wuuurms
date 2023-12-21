@@ -23,5 +23,13 @@
     "aws-cdk-lib": "2.115.0",
     "constructs": "^10.0.0",
     "source-map-support": "^0.5.21"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "tabWidth": 2,
+    "useTabs": false,
+    "trailingComma": "all",
+    "printWidth": 120
   }
 }

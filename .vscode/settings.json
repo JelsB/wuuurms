@@ -1,0 +1,8 @@
+// Version control this file to share common VsCode settings across the team
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "[typescript]": {
+    "editor.formatOnSave": true
+  }
+}
