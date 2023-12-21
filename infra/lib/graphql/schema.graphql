@@ -1,0 +1,23 @@
+enum BoardGameType {
+  CO_OP
+  WORKER_PLACEMENT
+}
+
+type BoardGame
+  @model
+  @auth(
+    rules: [
+      { allow: public, operations: [read], provider: iam }
+      { allow: private, operations: [read] }
+      { allow: groups, groups: ["admin"] }
+    ]
+  ) {
+  id: ID!
+  name: String!
+  description: String!
+  minimumNumberOfPlayers: Int!
+  maximumNumberOfPlayers: Int
+  minimumDuration: Int!
+  maximumDuration: Int
+  type: BoardGameType!
+}
