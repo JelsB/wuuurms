@@ -21,3 +21,10 @@ type BoardGame
   maximumDuration: Int
   type: BoardGameType!
 }
+
+type player @model {
+  id: ID!
+  name: String!
+  score: Int!
+  played_boardgames: [BoardGame] @hasMany
+}
