@@ -55,7 +55,39 @@ type Badge @model {
   # to convert the state to the correct type based on the badge type.
   # The alternative makes it slightly easier to know the state type.
   # Because this will need a custom Lambda resolver any way, I don't think it matters.
-  # This remains a private field, so it's not exposed to the client.
+  # This is a field that the client should not use directly.
   state: String!
   achieved: Boolean!
+}
+
+enum HouseColour {
+  RED
+  BLUE
+  GREEN
+  YELLOW
+  ORANGE
+  PURPLE
+  BLACK
+}
+type House @model {
+  id: ID!
+  colour: HouseColour!
+  players: [player] @hasMany
+  badges: [Badge] @hasMany
+}
+
+enum HouseBadgeType {
+  EARLY_BIRDS
+  SUPER_SECRET_ACHIEVEMENT
+  PRIME_SQUAD
+}
+
+type HouseBadge @model {
+  id: ID!
+  name: String!
+  description: String!
+  type: HouseBadgeType!
+  # Same comment as for the Badge.
+  state: String!
+  progress: Float!
 }
