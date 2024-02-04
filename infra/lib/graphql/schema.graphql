@@ -27,4 +27,35 @@ type player @model {
   name: String!
   score: Int!
   played_boardgames: [BoardGame] @hasMany
+  badges: [Badge] @hasMany
+}
+
+enum BadgeType {
+  PARTICIPATOR
+  DISCOVERER
+  SURVIVOR
+  SOCIALISER
+  WRITER
+  EXPLORER
+  COMEBACK_KID
+}
+
+type Badge @model {
+  id: ID!
+  name: String!
+  description: String!
+  type: BadgeType!
+  # The state type will be different per type of badge but polymorphism
+  # is not supported with the @model directive.
+  # This would create a table per badge type, which is overkill.
+  # The alternative to this, would be to include this into the player object
+  # with a field per badge type.
+  # Not sure yet which approach is better.
+  # The current moves logic into the resolvers when updating the state, needing
+  # to convert the state to the correct type based on the badge type.
+  # The alternative makes it slightly easier to know the state type.
+  # Because this will need a custom Lambda resolver any way, I don't think it matters.
+  # This remains a private field, so it's not exposed to the client.
+  state: String!
+  achieved: Boolean!
 }
