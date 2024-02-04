@@ -30,7 +30,7 @@ export class BackendStack extends cdk.Stack {
     const echoLambda = new lambda.Function(this, 'EchoLambda', {
       code: lambda.Code.fromAsset(path.join(__dirname, './graphql/echo')),
       handler: 'index.handler',
-      runtime: lambda.Runtime.NODEJS_18_X
+      runtime: lambda.Runtime.NODEJS_18_X,
     });
 
     const amplifyApi = new AmplifyGraphqlApi(this, 'GraphQlApi', {
@@ -49,7 +49,7 @@ export class BackendStack extends cdk.Stack {
         
       },
       functionNameMap:{
-       'update_player_score': echoLambda
+       'updatePlayerScore': echoLambda
       }
     })
   }

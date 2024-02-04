@@ -100,5 +100,5 @@ input UpdateScoreInput {
 }
 
 type Mutation {
-  update_player_score(input: UpdateScoreInput): String @function(name: "update_player_score")
+  update_player_score(input: UpdateScoreInput): String @function(name: "updatePlayerScore")
 }
