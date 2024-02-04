@@ -91,3 +91,14 @@ type HouseBadge @model {
   state: String!
   progress: Float!
 }
+
+input UpdateScoreInput {
+  id: ID!
+  boardgame_name: String!
+  placement: Int!
+  number_of_players: Int!
+}
+
+type Mutation {
+  update_player_score(input: UpdateScoreInput): String @function(name: "update_player_score")
+}

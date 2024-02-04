@@ -1,4 +1,5 @@
 import * as cdk from 'aws-cdk-lib'
+import * as lambda from 'aws-cdk-lib/aws-lambda'
 import { Construct } from 'constructs'
 import { AmplifyGraphqlApi, AmplifyGraphqlDefinition } from '@aws-amplify/graphql-api-construct'
 import * as path from 'path'
@@ -26,6 +27,12 @@ export class BackendStack extends cdk.Stack {
       },
     })
 
+    const echoLambda = new lambda.Function(this, 'EchoLambda', {
+      code: lambda.Code.fromAsset(path.join(__dirname, './graphql/echo')),
+      handler: 'index.handler',
+      runtime: lambda.Runtime.NODEJS_18_X
+    });
+
     const amplifyApi = new AmplifyGraphqlApi(this, 'GraphQlApi', {
       definition: AmplifyGraphqlDefinition.fromFiles(path.join(__dirname, './graphql/schema.graphql')),
       authorizationModes: {
@@ -39,7 +46,11 @@ export class BackendStack extends cdk.Stack {
         userPoolConfig: {
           userPool: userPool,
         },
+        
       },
+      functionNameMap:{
+       'update_player_score': echoLambda
+      }
     })
   }
 }
