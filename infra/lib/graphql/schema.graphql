@@ -56,8 +56,8 @@ type Badge @model {
   # The alternative makes it slightly easier to know the state type.
   # Because this will need a custom Lambda resolver any way, I don't think it matters.
   # This is a field that the client should not use directly.
-  state: String!
-  achieved: Boolean!
+  state: String
+  achieved: Boolean
 }
 
 enum HouseColour {
@@ -73,7 +73,7 @@ type House @model {
   id: ID!
   colour: HouseColour!
   players: [player] @hasMany
-  badges: [Badge] @hasMany
+  badges: [Badge]! @hasMany
 }
 
 enum HouseBadgeType {
@@ -88,8 +88,8 @@ type HouseBadge @model {
   description: String!
   type: HouseBadgeType!
   # Same comment as for the Badge.
-  state: String!
-  progress: Float!
+  state: String
+  progress: Float
 }
 
 input UpdateScoreInput {
