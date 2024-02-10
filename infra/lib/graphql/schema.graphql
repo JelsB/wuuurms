@@ -9,7 +9,7 @@ type BoardGame
     rules: [
       { allow: public, operations: [read], provider: iam }
       { allow: private, operations: [read] }
-      { allow: groups, groups: ["admin"] }
+      { allow: groups, groups: ["admins"] }
     ]
   ) {
   id: ID!
@@ -22,7 +22,7 @@ type BoardGame
   type: BoardGameType!
 }
 
-type player @model {
+type player @model @auth(rules: [{ allow: groups, groups: ["admins"] }]) {
   id: ID!
   name: String!
   score: Int!
@@ -40,7 +40,7 @@ enum BadgeType {
   COMEBACK_KID
 }
 
-type Badge @model {
+type Badge @model @auth(rules: [{ allow: groups, groups: ["admins"] }]) {
   id: ID!
   name: String!
   description: String!
@@ -69,7 +69,7 @@ enum HouseColour {
   PURPLE
   BLACK
 }
-type House @model {
+type House @model @auth(rules: [{ allow: groups, groups: ["admins"] }]) {
   id: ID!
   colour: HouseColour!
   players: [player] @hasMany
@@ -82,7 +82,7 @@ enum HouseBadgeType {
   PRIME_SQUAD
 }
 
-type HouseBadge @model {
+type HouseBadge @model @auth(rules: [{ allow: groups, groups: ["admins"] }]) {
   id: ID!
   name: String!
   description: String!
@@ -100,5 +100,7 @@ input UpdateScoreInput {
 }
 
 type Mutation {
-  update_player_score(input: UpdateScoreInput): String @function(name: "updatePlayerScore")
+  update_player_score(input: UpdateScoreInput): String
+    @auth(rules: [{ allow: groups, groups: ["admins"] }])
+    @function(name: "updatePlayerScore")
 }
