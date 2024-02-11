@@ -6,13 +6,15 @@ import * as path from 'path'
 import { CfnUserPoolGroup, UserPool, UserPoolClient } from 'aws-cdk-lib/aws-cognito'
 import { IdentityPool, UserPoolAuthenticationProvider } from '@aws-cdk/aws-cognito-identitypool-alpha'
 import { Role, WebIdentityPrincipal } from 'aws-cdk-lib/aws-iam'
+import assert from 'assert'
 
 /**
  * Contains most of the backend infrastructure.
  */
 export class BackendStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props: cdk.StackProps) {
     super(scope, id, props)
+    assert(props.env, 'props.env is required')
 
     const userPool = new UserPool(this, 'Pool')
     const userPoolClient = new UserPoolClient(this, 'PoolClient', { userPool: userPool })
@@ -45,10 +47,19 @@ export class BackendStack extends cdk.Stack {
     // explicitly add a dependency on the role so that the group is created after the role
     admins.addDependency(adminRole.node.defaultChild as cdk.CfnResource)
 
-    const echoLambda = new lambda.Function(this, 'EchoLambda', {
-      code: lambda.Code.fromAsset(path.join(__dirname, './graphql/echo')),
-      handler: 'index.handler',
-      runtime: lambda.Runtime.NODEJS_18_X,
+    const updatePlayerScoreResolver = new lambda.Function(this, 'UpdatePlayerScoreResolver', {
+      functionName: 'update_player_score_resolver',
+      runtime: lambda.Runtime.PYTHON_3_12,
+      code: lambda.Code.fromAsset(path.join(__dirname, './graphql/resolvers/update_player_score/update_player_score')),
+      handler: 'main.lambda_handler',
+      description: 'A GraphQL resolver to update the score of a player based on the outcome of a played game.',
+      layers: [
+        lambda.LayerVersion.fromLayerVersionArn(
+          this,
+          'AwsLambdaPowertools',
+          `arn:aws:lambda:${props.env.region}:017000801446:layer:AWSLambdaPowertoolsPythonV2:61`,
+        ),
+      ],
     })
 
     const amplifyApi = new AmplifyGraphqlApi(this, 'GraphQlApi', {
@@ -66,7 +77,7 @@ export class BackendStack extends cdk.Stack {
         },
       },
       functionNameMap: {
-        updatePlayerScore: echoLambda,
+        updatePlayerScore: updatePlayerScoreResolver,
       },
     })
   }

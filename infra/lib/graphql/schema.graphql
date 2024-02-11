@@ -100,7 +100,7 @@ input UpdateScoreInput {
 }
 
 type Mutation {
-  update_player_score(input: UpdateScoreInput): String
+  update_player_score(input: UpdateScoreInput): player
     @auth(rules: [{ allow: groups, groups: ["admins"] }])
     @function(name: "updatePlayerScore")
 }
