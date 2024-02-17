@@ -5,5 +5,16 @@
   "[typescript]": {
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "charliermarsh.ruff"
+  },
+  "cSpell.words": ["Powertools"],
+  "ruff.format.args": [
+    "--config=infra/lib/graphql/resolvers/update_player_score/pyproject.toml"
+  ],
+  "ruff.lint.args": [
+    "--config=infra/lib/graphql/resolvers/update_player_score/pyproject.toml"
+  ]
 }
