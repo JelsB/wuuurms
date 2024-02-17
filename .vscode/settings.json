@@ -8,7 +8,10 @@
   },
   "[python]": {
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "charliermarsh.ruff"
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    }
   },
   "cSpell.words": ["Powertools"],
   "ruff.format.args": [
@@ -16,5 +19,9 @@
   ],
   "ruff.lint.args": [
     "--config=infra/lib/graphql/resolvers/update_player_score/pyproject.toml"
-  ]
+  ],
+  "ruff.lint.run": "onSave",
+  "ruff.codeAction.fixViolation": {
+    "enable": true
+  }
 }
