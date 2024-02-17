@@ -23,5 +23,9 @@
   "ruff.lint.run": "onSave",
   "ruff.codeAction.fixViolation": {
     "enable": true
-  }
+  },
+  "mypy-type-checker.args": [
+    "--config-file=infra/lib/graphql/resolvers/update_player_score/pyproject.toml"
+  ],
+  "mypy-type-checker.path": ["mypy"]
 }

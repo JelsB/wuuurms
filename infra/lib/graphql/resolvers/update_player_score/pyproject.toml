@@ -12,6 +12,7 @@ python = "^3.12"
 [tool.poetry.group.dev.dependencies]
 aws-lambda-powertools = {extras = ["aws-all"], version = "^2.33.1"}
 ruff = "^0.2.1"
+mypy = "^1.8.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -28,4 +29,7 @@ target-version = "py312"
 
 [tool.ruff.format]
 quote-style = "single"
+
+[tool.mypy]
+python_version = "3.12"
 
