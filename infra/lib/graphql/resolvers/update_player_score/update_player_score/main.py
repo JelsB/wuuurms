@@ -1,4 +1,5 @@
 import random
+
 from aws_lambda_powertools import Logger, Tracer
 from aws_lambda_powertools.event_handler import AppSyncResolver
 from aws_lambda_powertools.logging import correlation_paths
@@ -28,8 +29,7 @@ class UpdateScoreInput(TypedDict):
 def update_score(input: UpdateScoreInput) -> Player:
     logger.info('Updating player score with random integer.', extra={'payload': input})
     random_int = random.randint(1, 100)
-    input['score'] = random_int
-    return {'id': input['id'], 'name': 'PLAYER NAME', 'score': random_int}
+    return {'id': input['id'], 'name': 'PLAYER NAME', 'score': str(random_int)}
 
 
 @logger.inject_lambda_context(correlation_id_path=correlation_paths.APPSYNC_RESOLVER)
