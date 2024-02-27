@@ -3,6 +3,12 @@ enum BoardGameType {
   WORKER_PLACEMENT
 }
 
+type BoardGameScoreParameters {
+  base_score: Int!
+  time_multiplier: Float!
+  number_of_players_multiplier: Float!
+}
+
 type BoardGame
   @model
   @auth(
@@ -20,6 +26,7 @@ type BoardGame
   minimumDuration: Int!
   maximumDuration: Int
   type: BoardGameType!
+  score_parameters: BoardGameScoreParameters!
 }
 
 type player @model @auth(rules: [{ allow: groups, groups: ["admins"] }]) {

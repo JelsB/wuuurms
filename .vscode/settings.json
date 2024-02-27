@@ -20,7 +20,6 @@
   "ruff.lint.args": [
     "--config=infra/lib/graphql/resolvers/update_player_score/pyproject.toml"
   ],
-  "ruff.lint.run": "onSave",
   "ruff.codeAction.fixViolation": {
     "enable": true
   },
