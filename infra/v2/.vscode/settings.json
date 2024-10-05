@@ -1,0 +1,12 @@
+// Version control this file to share common VsCode settings across the team
+{
+  "ruff.format.args": ["--config=./pyproject.toml"],
+  "ruff.lint.args": ["--config=./pyproject.toml"],
+  "ruff.codeAction.fixViolation": {
+    "enable": true
+  },
+  "python.analysis.typeCheckingMode": "basic",
+  // "python.testing.unittestArgs": ["-v", "-s", "./tests", "-p", "*test*.py", "-k"],
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false
+}

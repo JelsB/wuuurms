@@ -1,0 +1,31 @@
+[tool.poetry]
+authors = ["JelsB <boulangier.jels@gmail.com>"]
+description = "infra of wuuurms"
+name = "wuuurms-infra"
+readme = "README.md"
+version = "0.1.0"
+
+[tool.poetry.dependencies]
+aws-cdk-lib = "~2.161.1"
+constructs = "~10.3.0"
+python = "~3.12"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.3"
+ruff = "^0.6.9"
+
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core"]
+
+[tool.ruff]
+indent-width = 4
+line-length = 120
+
+# Assume Python 3.12
+target-version = "py312"
+
+[tool.ruff.lint]
+
+[tool.ruff.format]
+quote-style = "single"
