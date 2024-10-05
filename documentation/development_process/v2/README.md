@@ -40,3 +40,5 @@ build-backend = "poetry.core.masonry.api"
 ```
 poetry add --group=dev ruff
 ```
+
+Update cdk.json `app` command
