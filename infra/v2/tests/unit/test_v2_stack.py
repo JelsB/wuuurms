@@ -1,7 +1,7 @@
 import aws_cdk as core
 import aws_cdk.assertions as assertions
 
-from v2.v2_stack import V2Stack
+from stacks.v2_stack import V2Stack
 
 
 # example tests. To run these tests, uncomment this file along with the example
