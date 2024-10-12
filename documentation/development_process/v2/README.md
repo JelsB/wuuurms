@@ -68,3 +68,15 @@ Install new dependencies
 poetry install
 ```
 See https://docs.powertools.aws.dev/lambda/python/latest/ for aws-lambda-powertools and add basic handler for api gateway.
+
+
+Deploy with `npx cdk deploy` (after using the correct AWS profile).
+Test with `https://<API_ID>.execute-api.eu-central-1.amazonaws.com/prod/ping` or go to the API Gateway in the AWS console.
+
+Convert Lambda to use FastApi instead of aws lambda powertools:
+```
+poetry add fastapi@~0.115
+poetry add mangum@~0.19.0
+```
+No need for `[standard]` dependencies of fastapi because we will use `mangum` instead of `uvicorn`.
+TDB if we will need `uvicorn` for local development.

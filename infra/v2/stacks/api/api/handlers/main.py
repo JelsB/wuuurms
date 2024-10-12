@@ -1,7 +1,8 @@
-from aws_lambda_powertools.event_handler import APIGatewayRestResolver
-from aws_lambda_powertools.utilities.typing.lambda_context import LambdaContext
+from fastapi import FastAPI
+from mangum import Mangum
+# from aws_lambda_powertools.utilities.typing.lambda_context import LambdaContext
 
-app = APIGatewayRestResolver()
+app = FastAPI()
 
 
 @app.get('/ping')
@@ -9,5 +10,4 @@ def ping():
     return {'message': 'pong'}
 
 
-def lambda_handler(event: dict, context: LambdaContext) -> dict:
-    return app.resolve(event, context)
+lambda_handler = Mangum(app, lifespan='off')
