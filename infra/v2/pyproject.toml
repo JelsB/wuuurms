@@ -6,7 +6,8 @@ readme = "README.md"
 version = "0.1.0"
 
 [tool.poetry.dependencies]
-aws-cdk-lib = "~2.161.1"
+aws-cdk-aws-lambda-python-alpha = "2.161.1a0"
+aws-cdk-lib = "2.161.1"
 constructs = "~10.3.0"
 python = "~3.12"
 
@@ -19,6 +20,7 @@ build-backend = "poetry.core.masonry.api"
 requires = ["poetry-core"]
 
 [tool.ruff]
+fix = true
 indent-width = 4
 line-length = 120
 
@@ -28,4 +30,6 @@ target-version = "py312"
 [tool.ruff.lint]
 
 [tool.ruff.format]
+preview = true
 quote-style = "single"
+skip-magic-trailing-comma = true

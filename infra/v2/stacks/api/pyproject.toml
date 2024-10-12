@@ -1,0 +1,21 @@
+[tool.poetry]
+authors = ["JelsB <boulangier.jels@gmail.com>"]
+description = ""
+name = "api"
+readme = "README.md"
+version = "0.1.0"
+
+[tool.poetry.dependencies]
+python = "~3.12"
+
+[tool.poetry.group.dev.dependencies]
+aws-lambda-powertools = {extras = ["all", "aws-sdk"], version = "~3.1.0"}
+pytest = "^8.3.3"
+ruff = "^0.6.9"
+
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core"]
+
+[tool.ruff]
+extend = "../../pyproject.toml"
