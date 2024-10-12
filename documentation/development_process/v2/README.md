@@ -80,3 +80,6 @@ poetry add mangum@~0.19.0
 ```
 No need for `[standard]` dependencies of fastapi because we will use `mangum` instead of `uvicorn`.
 TDB if we will need `uvicorn` for local development.
+
+For faster deployments during development use
+`npx cdk deploy --hotswap`
