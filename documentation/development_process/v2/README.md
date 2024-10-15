@@ -83,3 +83,15 @@ TDB if we will need `uvicorn` for local development.
 
 For faster deployments during development use
 `npx cdk deploy --hotswap`
+
+Add `unvicorn` and `fastapi-cli` to dev dependencies for local development:
+
+```
+poetry add --group dev uvicorn
+poetry add --group dev fastapi-cli
+```
+
+From the `api` folder run:
+```
+fastapi dev api/handlers/main.py
+```

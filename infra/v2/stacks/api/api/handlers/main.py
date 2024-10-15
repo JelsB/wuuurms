@@ -21,4 +21,10 @@ def ping(request: Request):
     return {'message': 'pong'}
 
 
+@app.get('/local')
+def local():
+    """Path for local testing"""
+    return {'message': 'local'}
+
+
 lambda_handler = Mangum(app, lifespan='off')
