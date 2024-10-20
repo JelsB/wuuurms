@@ -1,4 +1,7 @@
+from os import environ
 from fastapi import FastAPI, status
+from fastapi.middleware.cors import CORSMiddleware
+
 from mangum import Mangum
 from starlette.requests import Request
 
@@ -7,8 +10,30 @@ from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 
 from api.logic.board_game import create_board_game
 from api.models.board_game import BoardGameInput, BoardGameOutput
+from api.settings import common_env_vars, local_env_vars
 
-app = FastAPI()
+local_settings = local_env_vars()
+env_vars = common_env_vars()
+fast_api_config = {}
+
+# Allow using local swagger UI to test the deployed API in the development environment
+if api_id := local_settings.api_id:
+    fast_api_config.update({
+        'servers': [
+            {'url': f'https://{api_id}.execute-api.eu-central-1.amazonaws.com/prod', 'description': 'AWS environment'},
+            {'url': '/', 'description': 'Local environment'},
+        ]
+    })
+
+
+app = FastAPI(**fast_api_config)
+
+# Allow using local swagger UI to test the deployed API in the development environment
+origins = ['http://127.0.0.1:8000'] if env_vars.environment == 'dev' else []
+
+app.add_middleware(
+    CORSMiddleware, allow_origins=origins, allow_credentials=True, allow_methods=['*'], allow_headers=['*']
+)
 
 
 @app.get('/ping')

@@ -43,6 +43,9 @@ class ApiStack(Stack):
             layers=[lambdaPowerToolsLayer],
         )
 
+        # TODO: temp cause only using dev environment at the moment
+        api.add_environment('ENVIRONMENT', 'dev')
+
         tables['board_game_table'].grant_read_write_data(api)
         api.add_environment('TABLE_NAME_BOARD_GAME', tables['board_game_table'].table_name)
 
