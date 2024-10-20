@@ -9,6 +9,8 @@ version = "0.1.0"
 python = "~3.12"
 fastapi = "~0.115"
 mangum = "~0.19.0"
+mypy-boto3-dynamodb = "~1.35.24"
+pydantic-settings = "~2.6.0"
 
 [tool.poetry.group.dev.dependencies]
 aws-lambda-powertools = {extras = ["all", "aws-sdk"], version = "~3.1.0"}

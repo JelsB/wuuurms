@@ -1,9 +1,12 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, status
 from mangum import Mangum
 from starlette.requests import Request
 
 from aws_lambda_powertools.utilities.typing.lambda_context import LambdaContext
-from aws_lambda_powertools.utilities.data_classes import event_source, APIGatewayProxyEvent
+from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
+
+from api.logic.board_game import create_board_game
+from api.models.board_game import BoardGameInput, BoardGameOutput
 
 app = FastAPI()
 
@@ -25,6 +28,12 @@ def ping(request: Request):
 def local():
     """Path for local testing"""
     return {'message': 'local'}
+
+
+@app.put('/board-game', status_code=status.HTTP_201_CREATED, response_model=BoardGameOutput)
+def board_game(board_game: BoardGameInput):
+    board_game_out = create_board_game(board_game)
+    return board_game_out
 
 
 lambda_handler = Mangum(app, lifespan='off')

@@ -1,21 +1,25 @@
 from pathlib import Path
+from typing import TypedDict
 
 from aws_cdk import Duration, Stack
 from aws_cdk.aws_apigateway import EndpointConfiguration, EndpointType, LambdaRestApi
+from aws_cdk.aws_dynamodb import ITableV2
 from aws_cdk.aws_lambda import LayerVersion, Runtime, Tracing
 from aws_cdk.aws_lambda_python_alpha import BundlingOptions, PythonFunction
 from aws_cdk.aws_logs import RetentionDays
 from constructs import Construct
 
+from stacks.databases_stack import Tables
+
 
 class ApiStack(Stack):
-    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, tables: Tables, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        api = self.create_api()
+        api = self.create_api(tables)
         self.create_api_gateway(api)
 
-    def create_api(self):
+    def create_api(self, tables: Tables):
         lambdaPowerToolsLayer = LayerVersion.from_layer_version_arn(
             self,
             'LambdaPowerToolsLayer',
@@ -38,6 +42,9 @@ class ApiStack(Stack):
             tracing=Tracing.ACTIVE,
             layers=[lambdaPowerToolsLayer],
         )
+
+        tables['board_game_table'].grant_read_write_data(api)
+        api.add_environment('TABLE_NAME_BOARD_GAME', tables['board_game_table'].table_name)
 
         return api
 
