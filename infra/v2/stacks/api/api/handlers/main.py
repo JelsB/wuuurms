@@ -29,6 +29,7 @@ if api_id := local_settings.api_id:
 app = FastAPI(**fast_api_config)
 
 # Allow using local swagger UI to test the deployed API in the development environment
+# TODO move this into infra env var?
 origins = ['http://127.0.0.1:8000'] if env_vars.environment == 'dev' else []
 
 app.add_middleware(
