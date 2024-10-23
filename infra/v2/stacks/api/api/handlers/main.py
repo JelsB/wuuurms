@@ -1,4 +1,3 @@
-from os import environ
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
 
