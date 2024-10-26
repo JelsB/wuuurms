@@ -1,9 +1,7 @@
 from pathlib import Path
-from typing import TypedDict
 
 from aws_cdk import Duration, Stack
 from aws_cdk.aws_apigateway import EndpointConfiguration, EndpointType, LambdaRestApi
-from aws_cdk.aws_dynamodb import ITableV2
 from aws_cdk.aws_lambda import LayerVersion, Runtime, Tracing
 from aws_cdk.aws_lambda_python_alpha import BundlingOptions, PythonFunction
 from aws_cdk.aws_logs import RetentionDays
@@ -48,6 +46,12 @@ class ApiStack(Stack):
 
         tables['board_game_table'].grant_read_write_data(api)
         api.add_environment('TABLE_NAME_BOARD_GAME', tables['board_game_table'].table_name)
+        tables['player_table'].grant_read_write_data(api)
+        api.add_environment('TABLE_NAME_PLAYER', tables['player_table'].table_name)
+        tables['team_table'].grant_read_write_data(api)
+        api.add_environment('TABLE_NAME_TEAM', tables['team_table'].table_name)
+        tables['user_table'].grant_read_write_data(api)
+        api.add_environment('TABLE_NAME_USER', tables['user_table'].table_name)
 
         return api
 

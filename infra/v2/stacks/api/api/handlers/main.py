@@ -7,8 +7,14 @@ from starlette.requests import Request
 from aws_lambda_powertools.utilities.typing.lambda_context import LambdaContext
 from aws_lambda_powertools.utilities.data_classes import APIGatewayProxyEvent
 
-from api.logic.board_game import create_board_game
+from api.logic.board_game import create_new_board_game
+from api.logic.player import create_new_player
+from api.logic.team import create_new_team
+from api.logic.user import create_new_user
 from api.models.board_game import BoardGameInput, BoardGameOutput
+from api.models.player import PlayerInput, PlayerOutput
+from api.models.team import TeamInput, TeamOutput
+from api.models.user import UserInput, UserOutput
 from api.settings import common_env_vars, local_env_vars
 
 local_settings = local_env_vars()
@@ -55,10 +61,28 @@ def local():
     return {'message': 'local'}
 
 
-@app.put('/board-game', status_code=status.HTTP_201_CREATED, response_model=BoardGameOutput)
-def board_game(board_game: BoardGameInput):
-    board_game_out = create_board_game(board_game)
+@app.post('/board-games/', status_code=status.HTTP_201_CREATED)
+def create_board_game(board_game: BoardGameInput) -> BoardGameOutput:
+    board_game_out = create_new_board_game(board_game)
     return board_game_out
+
+
+@app.post('/users/', status_code=status.HTTP_201_CREATED)
+def create_user(user: UserInput) -> UserOutput:
+    user_out = create_new_user(user)
+    return user_out
+
+
+@app.post('/players/', status_code=status.HTTP_201_CREATED)
+def create_player(player: PlayerInput) -> PlayerOutput:
+    player_out = create_new_player(player)
+    return player_out
+
+
+@app.post('/teams/', status_code=status.HTTP_201_CREATED)
+def create_team(team: TeamInput) -> TeamOutput:
+    team_out = create_new_team(team)
+    return team_out
 
 
 lambda_handler = Mangum(app, lifespan='off')

@@ -4,6 +4,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class TableName(BaseSettings):
     board_game: str
+    player: str
+    team: str
+    user: str
     model_config = SettingsConfigDict(env_prefix='TABLE_NAME_')
 
 

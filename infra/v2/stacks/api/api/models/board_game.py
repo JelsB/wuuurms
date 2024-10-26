@@ -1,6 +1,7 @@
+from decimal import Decimal
 from enum import StrEnum
 import uuid
-from pydantic import UUID4, BaseModel, Field
+from pydantic import UUID4, BaseModel, Field, PositiveInt
 
 
 class BoardGameKind(StrEnum):
@@ -29,16 +30,19 @@ class BoardGameMechanic(StrEnum):
     PEN_AND_PAPER = 'pen and paper'
 
 
+Name = Field(min_length=1, max_length=300, description='Name of the board game')
+
+
 class BoardGameBase(BaseModel):
-    name: str = Field(min_length=1, max_length=300, description='Name of the board game')
+    name: str = Name
     description: str = Field(min_length=1, max_length=300, description='Description of the board game')
-    min_players: int = Field(ge=1, description='Minimum number of players')
-    max_players: int = Field(ge=1, description='Maximum number of players')
-    min_playing_time: int = Field(ge=1, description='Minimum playing time in minutes')
-    max_playing_time: int = Field(ge=1, description='Maximum playing time in minutes')
-    min_age: int = Field(ge=1, description='Minimum age to play the board')
-    average_rating: float = Field(ge=0, le=10, description='Average rating of the board game on a scale from 0 to 10')
-    complexity: float = Field(ge=0, le=5, description='Complexity of the board game on a scale from 0 to 5')
+    min_players: PositiveInt = Field(description='Minimum number of players')
+    max_players: PositiveInt = Field(description='Maximum number of players')
+    min_playing_time: PositiveInt = Field(description='Minimum playing time in minutes')
+    max_playing_time: PositiveInt = Field(description='Maximum playing time in minutes')
+    min_age: PositiveInt = Field(description='Minimum age to play the board')
+    average_rating: Decimal = Field(ge=0, le=10, description='Average rating of the board game on a scale from 0 to 10')
+    complexity: Decimal = Field(ge=0, le=5, description='Complexity of the board game on a scale from 0 to 5')
     kind: BoardGameKind = Field(description='Kind of board game')
     mechanics: list[BoardGameMechanic] = Field(description='Mechanics of the board game')
 
@@ -47,9 +51,10 @@ class BoardGameInput(BoardGameBase):
     pass
 
 
-class BoardGameOutput(BoardGameBase):
-    pass
+class BoardGameOutput(BaseModel):
+    name: str = Name
+    id: UUID4 = Field(description='Unique identifier of the board game')
 
 
 class BoardGameInDdb(BoardGameBase):
-    pk: UUID4 = Field(default_factory=lambda: uuid.uuid4().hex)
+    pk: str = Field(default_factory=lambda: str(uuid.uuid4()))
