@@ -1,7 +1,7 @@
 import uuid
-from api.data_access.ddb_client import DdbClient
-from api.models.board_game import BoardGameInDdb, BoardGameInput, BoardGameOutput
-from api.settings import table_name
+from api_old.data_access.ddb_client import DdbClient
+from api_old.models.board_game import BoardGameInDdb, BoardGameInput, BoardGameOutput
+from api_old.settings import table_name
 
 
 def create_new_board_game(board_game: BoardGameInput):

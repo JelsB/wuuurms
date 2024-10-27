@@ -1,5 +1,5 @@
 from api.data_access.ddb_client import DdbClient
-from api.models.player import PlayerInDdb, PlayerInput, PlayerOutput
+from api.entities.player.models import PlayerInDdb, PlayerInput, PlayerOutput
 from api.settings import table_name
 
 

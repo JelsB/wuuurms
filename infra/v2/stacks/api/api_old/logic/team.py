@@ -1,7 +1,7 @@
 import uuid
-from api.data_access.ddb_client import DdbClient
-from api.models.team import TeamInDdb, TeamInput, TeamOutput
-from api.settings import table_name
+from api_old.data_access.ddb_client import DdbClient
+from api_old.models.team import TeamInDdb, TeamInput, TeamOutput
+from api_old.settings import table_name
 
 
 def create_new_team(team: TeamInput):

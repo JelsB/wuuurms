@@ -1,5 +1,5 @@
 from api.data_access.ddb_client import DdbClient
-from api.models.user import UserInDdb, UserInput, UserOutput
+from api.entities.user.models import UserInDdb, UserInput, UserOutput
 from api.settings import table_name
 
 
