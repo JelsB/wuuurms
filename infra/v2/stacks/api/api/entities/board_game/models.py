@@ -1,5 +1,7 @@
 from decimal import Decimal
 from enum import StrEnum
+from re import I
+from unittest.mock import Base
 import uuid
 from pydantic import UUID4, BaseModel, Field, PositiveInt
 
@@ -58,3 +60,7 @@ class BoardGameOutput(BaseModel):
 
 class BoardGameInDdb(BoardGameBase):
     pk: str = Field(default_factory=lambda: str(uuid.uuid4()))
+
+
+class GetBoardGameOutput(BoardGameBase):
+    pass

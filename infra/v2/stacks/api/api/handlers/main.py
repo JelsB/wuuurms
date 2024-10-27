@@ -25,8 +25,8 @@ fast_api_config = {}
 if api_id := local_settings.api_id:
     fast_api_config.update({
         'servers': [
-            {'url': f'https://{api_id}.execute-api.eu-central-1.amazonaws.com/prod', 'description': 'AWS environment'},
             {'url': '/', 'description': 'Local environment'},
+            {'url': f'https://{api_id}.execute-api.eu-central-1.amazonaws.com/prod', 'description': 'AWS environment'},
         ]
     })
 
