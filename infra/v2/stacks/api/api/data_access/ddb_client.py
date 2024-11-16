@@ -1,10 +1,10 @@
-from typing import Any, List, cast
+from typing import Any, List, Unpack, cast
 
 import boto3
-from boto3.dynamodb.conditions import Key
 from botocore.exceptions import BotoCoreError
 from mypy_boto3_dynamodb import DynamoDBServiceResource
 from mypy_boto3_dynamodb.service_resource import Table
+from mypy_boto3_dynamodb.type_defs import QueryInputTableQueryTypeDef
 
 from api.observability import logger
 from api.exceptions import DatabaseException
@@ -55,20 +55,10 @@ class DdbClient:
         except BotoCoreError as e:
             raise DatabaseException('Failed to get a batch of player with partition keys.') from e
 
-    def get_items_from_gsi(self, gsi_name: str, gsi_keys: dict[str, str]) -> List[dict]:
-        key_condition_expression = None
-        for key, value in gsi_keys.items():
-            key_condition_expression = (
-                Key(key).eq(value)
-                if key_condition_expression is None
-                else key_condition_expression & Key(key).eq(value)
-            )
-        # typeguard
-        assert key_condition_expression is not None
-
+    def get_items_from_gsi(self, **kwargs: Unpack[QueryInputTableQueryTypeDef]) -> List[dict]:
         try:
             table: Table = self._ddb_table_client
-            response = table.query(IndexName=gsi_name, KeyConditionExpression=key_condition_expression)
+            response = table.query(**kwargs)
 
             return response['Items']
 

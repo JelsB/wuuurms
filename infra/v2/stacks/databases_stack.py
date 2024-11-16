@@ -1,6 +1,14 @@
 from typing import TypedDict
 from aws_cdk import Stack
-from aws_cdk.aws_dynamodb import Attribute, AttributeType, Billing, Capacity, ITableV2, TableV2
+from aws_cdk.aws_dynamodb import (
+    Attribute,
+    AttributeType,
+    Billing,
+    Capacity,
+    GlobalSecondaryIndexPropsV2,
+    ITableV2,
+    TableV2,
+)
 from constructs import Construct
 
 
@@ -35,6 +43,13 @@ class DatabasesStack(Stack):
                 read_capacity=Capacity.fixed(1), write_capacity=Capacity.autoscaled(max_capacity=1)
             ),
             partition_key=Attribute(name='pk', type=AttributeType.STRING),
+            global_secondary_indexes=[
+                GlobalSecondaryIndexPropsV2(
+                    index_name='GSI1',
+                    partition_key=Attribute(name='GSI1PK', type=AttributeType.STRING),
+                    sort_key=Attribute(name='GSI1SK', type=AttributeType.STRING),
+                )
+            ],
         )
 
     def create_player_table(self):
