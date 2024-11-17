@@ -1,9 +1,10 @@
 from typing import Annotated
-from fastapi import APIRouter, Path, Query, status
-from pydantic import UUID4
+from fastapi import APIRouter, HTTPException, Path, Query, status
+from pydantic import UUID4  # , BaseModel
 
 import api.entities.board_game.logic as logic
 from api.entities.board_game.models import BoardGameInput, BoardGameOutput, GetBoardGameOutput, ListFilterParams
+from api.exceptions import DatabaseException, ItemNotFound
 
 
 router = APIRouter(prefix='/board-games', tags=['board games'])
@@ -15,13 +16,26 @@ def create_board_game(board_game: BoardGameInput) -> BoardGameOutput:
     return board_game_out
 
 
-@router.get('/{id}')
+# Add model to create openApi documentation for 404 response
+# class HTTP_404_Model(BaseModel):
+#     detail: str
+
+
+@router.get(
+    '/{id}'
+    # for openApi documentation
+    # responses={404: {'description': 'Board game not found', 'model': HTTP_404_Model}}
+)
 def get_board_game(
     id: Annotated[UUID4, Path(title='Unique identifier of the board game to retrieve')],
 ) -> GetBoardGameOutput:
-    out = logic.get_board_game(str(id))
-    # TODO implement a 404 response if the board game is not found
-    return out
+    try:
+        out = logic.get_board_game(str(id))
+        return out
+    except ItemNotFound:
+        raise HTTPException(status_code=404, detail='Board game not found.')
+    except DatabaseException:
+        raise HTTPException(status_code=500, detail='Internal server error')
 
 
 @router.get('/')

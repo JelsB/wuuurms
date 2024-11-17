@@ -7,7 +7,7 @@ from mypy_boto3_dynamodb.service_resource import Table
 from mypy_boto3_dynamodb.type_defs import QueryInputTableQueryTypeDef
 
 from api.observability import logger
-from api.exceptions import DatabaseException
+from api.exceptions import DatabaseException, ItemNotFound
 
 
 class DdbClient:
@@ -31,7 +31,7 @@ class DdbClient:
             response = self._ddb_table_client.get_item(Key=pk)
             if 'Item' not in response:
                 logger.error(f'Item with {pk=} not found.')
-                raise DatabaseException(f'Item with {pk=} not found.')
+                raise ItemNotFound(item_key=pk, table=self.ddb_table_name)
             return response['Item']
         except self._ddb_client.meta.client.exceptions.ClientError as e:
             if e.response['Error']['Code'] == 'ResourceNotFoundException':

@@ -6,6 +6,7 @@ from mypy_boto3_dynamodb.type_defs import QueryInputTableQueryTypeDef
 
 from api.data_access.ddb_client import DdbClient
 from api.entities.board_game.models import BoardGameInDdb, BoardGameInput, BoardGameOutput, GetBoardGameOutput
+from api.exceptions import ItemNotFound
 from api.settings import table_name
 
 
