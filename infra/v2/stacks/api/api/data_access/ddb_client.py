@@ -29,6 +29,8 @@ class DdbClient:
     def get_item_from_pk(self, pk: dict[str, str]) -> dict:
         try:
             response = self._ddb_table_client.get_item(Key=pk)
+            if 'Item' not in response:
+                raise DatabaseException(f'Item with {pk=} not found.')
             return response['Item']  # TODO: typeguard for non-existant item key. Will this not just return Exception?
         except self._ddb_client.meta.client.exceptions.ClientError as e:
             if e.response['Error']['Code'] == 'ResourceNotFoundException':
