@@ -60,6 +60,7 @@ def get_board_games_by_name(
     board_games_from_db = ddb_client._ddb_table_client.query(**query_params)
 
     board_games_out = [
-        GetBoardGameOutput(**board_game, id=board_game['pk']) for board_game in board_games_from_db['Items']
+        GetBoardGameOutput(**board_game, id=board_game['pk'])  # pyright: ignore[reportArgumentType]
+        for board_game in board_games_from_db['Items']
     ]
     return board_games_out

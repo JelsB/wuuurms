@@ -1,6 +1,6 @@
-from typing import Annotated, Literal
+from typing import Annotated
 from fastapi import APIRouter, Path, Query, status
-from pydantic import UUID4, BaseModel, Field
+from pydantic import UUID4
 
 import api.entities.board_game.logic as logic
 from api.entities.board_game.models import BoardGameInput, BoardGameOutput, GetBoardGameOutput, ListFilterParams
