@@ -64,3 +64,8 @@ def get_board_games_by_name(
         for board_game in board_games_from_db['Items']
     ]
     return board_games_out
+
+
+def delete_board_game(id: str):
+    ddb_client = DdbClient(table_name().board_game)
+    ddb_client.delete_item({'pk': id})

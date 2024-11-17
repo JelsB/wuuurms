@@ -55,20 +55,20 @@ class DdbClient:
         except BotoCoreError as e:
             raise DatabaseException('Failed to get a batch of player with partition keys.') from e
 
-    def get_items_from_gsi(self, **kwargs: Unpack[QueryInputTableQueryTypeDef]) -> List[dict]:
-        try:
-            table: Table = self._ddb_table_client
-            response = table.query(**kwargs)
+    # def get_items_from_gsi(self, **kwargs: Unpack[QueryInputTableQueryTypeDef]) -> List[dict]:
+    #     try:
+    #         table: Table = self._ddb_table_client
+    #         response = table.query(**kwargs)
 
-            return response['Items']
+    #         return response['Items']
 
-        except table.meta.client.exceptions.ClientError as e:
-            if e.response['Error']['Code'] == 'ResourceNotFoundException':
-                raise DatabaseException(f'Items with GSI {gsi_name} and values {gsi_keys} not found') from e
-            else:
-                raise DatabaseException(f'Failed to get items with GSI {gsi_name} and values {gsi_keys}') from e
-        except BotoCoreError as e:
-            raise DatabaseException(f'Failed to get items with GSI {gsi_name} and values {gsi_keys}') from e
+    #     except table.meta.client.exceptions.ClientError as e:
+    #         if e.response['Error']['Code'] == 'ResourceNotFoundException':
+    #             raise DatabaseException(f'Items with GSI {gsi_name} and values {gsi_keys} not found') from e
+    #         else:
+    #             raise DatabaseException(f'Failed to get items with GSI {gsi_name} and values {gsi_keys}') from e
+    #     except BotoCoreError as e:
+    #         raise DatabaseException(f'Failed to get items with GSI {gsi_name} and values {gsi_keys}') from e
 
     def update_item(self, pk: dict, attributes: dict[str, Any]):
         """Updates the attributes of an item in the table.
@@ -113,3 +113,23 @@ class DdbClient:
                 raise DatabaseException(f'Failed to put item with {item=}.') from e
         except BotoCoreError as e:
             raise DatabaseException(f'Failed to put item with {item=}.') from e
+
+    def delete_item(self, pk: dict):
+        """Deletes an item from the table.
+
+        Args:
+            pk (dict): partition key of the item
+
+        Raises:
+            DatabaseException: Some issue with the database operation.
+        """
+        try:
+            # TODO: condition to check if it also exists? API call will be successful even if it doesn't exist.
+            self._ddb_table_client.delete_item(Key=pk)
+        except self._ddb_client.meta.client.exceptions.ClientError as e:
+            if e.response['Error']['Code'] == 'ResourceNotFoundException':
+                raise DatabaseException(f'Item with {pk=} not found.') from e
+            else:
+                raise DatabaseException(f'Failed to delete item with {pk=}.') from e
+        except BotoCoreError as e:
+            raise DatabaseException(f'Failed to delete item with {pk=}.') from e

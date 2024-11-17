@@ -34,3 +34,9 @@ def get_board_games(query_params: Annotated[ListFilterParams, Query()]) -> list[
         limit=query_params.limit, ordering=query_params.order_by_name, start_board_game=start_board_game
     )
     return out
+
+
+@router.delete('/{id}', status_code=status.HTTP_200_OK)
+def delete_board_game(id: Annotated[UUID4, Path(title='Unique identifier of the board game to delete')]):
+    logic.delete_board_game(str(id))
+    return {'message': f'Board game with id {id} was successfully deleted.'}
