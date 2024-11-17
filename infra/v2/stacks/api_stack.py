@@ -33,7 +33,7 @@ class ApiStack(Stack):
             entry=str(Path(__file__).parent / 'api'),
             index='api/handlers/main.py',
             handler='lambda_handler',
-            bundling=BundlingOptions(asset_excludes=['tests/', '**/*cache*/', '*.md', '.vscode/', 'api_old/']),
+            bundling=BundlingOptions(asset_excludes=['tests/', '**/*cache*/', '*.md', '.vscode/']),
             environment={'POWERTOOLS_SERVICE_NAME': 'api'},
             timeout=Duration.seconds(5),
             log_retention=RetentionDays.TWO_WEEKS,
