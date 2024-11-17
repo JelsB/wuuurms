@@ -1,27 +1,12 @@
-from email.policy import HTTP
-from typing import Annotated, Any, Dict, Literal
+from typing import Annotated
 from fastapi import APIRouter, HTTPException, Path, Query, status
-from pydantic import UUID4, BaseModel
+from pydantic import UUID4
 
+from api.common_router.responses import HTTP_RESPONSES
 import api.entities.board_game.logic as logic
 from api.entities.board_game.models import BoardGameInput, BoardGameOutput, GetBoardGameOutput, ListFilterParams
 from api.exceptions import DatabaseException, ItemNotFound
 
-
-class HTTPExceptionModel(BaseModel):
-    """Model to create openApi documentation for HTTP exceptions"""
-
-    detail: str
-
-
-HTTP_RESPONSES: Dict[int, Dict[int | str, Dict[str, Any]]] = {
-    status.HTTP_404_NOT_FOUND: {
-        status.HTTP_404_NOT_FOUND: {'description': 'Board game not found', 'model': HTTPExceptionModel}
-    },
-    status.HTTP_500_INTERNAL_SERVER_ERROR: {
-        status.HTTP_500_INTERNAL_SERVER_ERROR: {'description': 'Internal server error', 'model': HTTPExceptionModel}
-    },
-}
 
 # no type error
 router = APIRouter(

@@ -27,6 +27,7 @@ if api_id := local_settings.api_id:
         ]
     })
 
+
 app = FastAPI(**fast_api_config)
 
 # Allow using local swagger UI to test the deployed API in the development environment
