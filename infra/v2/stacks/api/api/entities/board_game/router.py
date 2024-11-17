@@ -1,13 +1,32 @@
-from typing import Annotated
+from email.policy import HTTP
+from typing import Annotated, Any, Dict, Literal
 from fastapi import APIRouter, HTTPException, Path, Query, status
-from pydantic import UUID4  # , BaseModel
+from pydantic import UUID4, BaseModel
 
 import api.entities.board_game.logic as logic
 from api.entities.board_game.models import BoardGameInput, BoardGameOutput, GetBoardGameOutput, ListFilterParams
 from api.exceptions import DatabaseException, ItemNotFound
 
 
-router = APIRouter(prefix='/board-games', tags=['board games'])
+class HTTPExceptionModel(BaseModel):
+    """Model to create openApi documentation for HTTP exceptions"""
+
+    detail: str
+
+
+HTTP_RESPONSES: Dict[int, Dict[int | str, Dict[str, Any]]] = {
+    status.HTTP_404_NOT_FOUND: {
+        status.HTTP_404_NOT_FOUND: {'description': 'Board game not found', 'model': HTTPExceptionModel}
+    },
+    status.HTTP_500_INTERNAL_SERVER_ERROR: {
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {'description': 'Internal server error', 'model': HTTPExceptionModel}
+    },
+}
+
+# no type error
+router = APIRouter(
+    prefix='/board-games', tags=['board games'], responses=HTTP_RESPONSES[status.HTTP_500_INTERNAL_SERVER_ERROR]
+)
 
 
 @router.post('/', status_code=status.HTTP_201_CREATED)
@@ -16,16 +35,7 @@ def create_board_game(board_game: BoardGameInput) -> BoardGameOutput:
     return board_game_out
 
 
-# Add model to create openApi documentation for 404 response
-# class HTTP_404_Model(BaseModel):
-#     detail: str
-
-
-@router.get(
-    '/{id}'
-    # for openApi documentation
-    # responses={404: {'description': 'Board game not found', 'model': HTTP_404_Model}}
-)
+@router.get('/{id}', responses=HTTP_RESPONSES[status.HTTP_404_NOT_FOUND])
 def get_board_game(
     id: Annotated[UUID4, Path(title='Unique identifier of the board game to retrieve')],
 ) -> GetBoardGameOutput:
@@ -33,7 +43,7 @@ def get_board_game(
         out = logic.get_board_game(str(id))
         return out
     except ItemNotFound:
-        raise HTTPException(status_code=404, detail='Board game not found.')
+        raise HTTPException(status_code=404, detail=f'Board game with id {id} was not found.')
     except DatabaseException:
         raise HTTPException(status_code=500, detail='Internal server error')
 
