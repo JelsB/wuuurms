@@ -30,14 +30,18 @@ class DdbClient:
         try:
             response = self._ddb_table_client.get_item(Key=pk)
             if 'Item' not in response:
+                logger.error(f'Item with {pk=} not found.')
                 raise DatabaseException(f'Item with {pk=} not found.')
-            return response['Item']  # TODO: typeguard for non-existant item key. Will this not just return Exception?
+            return response['Item']
         except self._ddb_client.meta.client.exceptions.ClientError as e:
             if e.response['Error']['Code'] == 'ResourceNotFoundException':
-                raise DatabaseException(f'Item with {pk=} not found.') from e
+                logger.error(f'Table or index does not exist: {self.ddb_table_name}')
+                raise DatabaseException('Table or index does not exist.') from e
             else:
+                logger.error(f'Failed to get item with {pk=}. Error: {e}')
                 raise DatabaseException(f'Failed to get item with {pk=}.') from e
         except BotoCoreError as e:
+            logger.error(f'Failed to get item with {pk=}. Error: {e}')
             raise DatabaseException(f'Failed to get item with {pk=}.') from e
 
     def get_batch_items_from_pk(self, pks: List[dict]):
