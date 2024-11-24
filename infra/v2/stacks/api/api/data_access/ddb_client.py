@@ -1,3 +1,4 @@
+from math import log
 from typing import Any, List, Unpack, cast
 
 import boto3
@@ -88,18 +89,26 @@ class DdbClient:
             DatabaseException: Some issue with the database operation.
         """
         try:
+            # TODO: condition to check if it also exists? API call will silently be successful even if it doesn't exist.
             self._ddb_table_client.update_item(
                 Key=pk,
-                UpdateExpression='SET ' + ', '.join([f'{key} = :{key}' for key in attributes.keys()]),
-                ExpressionAttributeValues={f':{key}': value for key, value in attributes.items()},
+                # Adds one or more attributes and values to an item.
+                # If any of these attributes already exist, they are replaced by the new values.
+                UpdateExpression='SET ' + ', '.join([f'#{key} = :val_{key}' for key in attributes.keys()]),
+                ExpressionAttributeNames={f'#{key}': key for key in attributes.keys()},
+                ExpressionAttributeValues={f':val_{key}': value for key, value in attributes.items()},
             )
         except self._ddb_client.meta.client.exceptions.ClientError as e:
             if e.response['Error']['Code'] == 'ResourceNotFoundException':
+                # TODO: this is incorrectly catching the exception when the item does not exist.
+                logger.error(f'Item with {pk=} not found.')
                 raise DatabaseException(f'Item with {pk=} not found.') from e
             else:
-                raise DatabaseException(f'Failed to update item with {pk=}.') from e
+                logger.error(f'Failed to update item with {pk=}. Error: {e}')
+                raise DatabaseException(f'Failed to update item with {pk=} and {attributes=}.') from e
         except BotoCoreError as e:
-            raise DatabaseException(f'Failed to update item with {pk=}.') from e
+            logger.error(f'Failed 2 to update item with {pk=}. Error: {e}')
+            raise DatabaseException(f'Failed to update item with {pk=} and {attributes=}.') from e
 
     def put_item(self, item: dict):
         """Puts an item into the table.
