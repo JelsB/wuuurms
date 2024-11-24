@@ -2,6 +2,7 @@ from math import log
 from typing import Any, List, Unpack, cast
 
 import boto3
+from boto3.dynamodb.conditions import Attr
 from botocore.exceptions import BotoCoreError
 from mypy_boto3_dynamodb import DynamoDBServiceResource
 from mypy_boto3_dynamodb.service_resource import Table
@@ -88,6 +89,15 @@ class DdbClient:
         Raises:
             DatabaseException: Some issue with the database operation.
         """
+        # key_condition_expression = None
+        # for key, value in gsi_keys.items():
+        #     key_condition_expression = (
+        #         Key(key).eq(value)
+        #         if key_condition_expression is None
+        #         else key_condition_expression & Key(key).eq(value)
+        #     )
+        # # typeguard
+        # assert key_condition_expression is not None
         try:
             # TODO: condition to check if it also exists? API call will silently be successful even if it doesn't exist.
             self._ddb_table_client.update_item(
@@ -97,15 +107,17 @@ class DdbClient:
                 UpdateExpression='SET ' + ', '.join([f'#{key} = :val_{key}' for key in attributes.keys()]),
                 ExpressionAttributeNames={f'#{key}': key for key in attributes.keys()},
                 ExpressionAttributeValues={f':val_{key}': value for key, value in attributes.items()},
+                # NOTE: not accepting a dict for the PK will make this simpler
+                ConditionExpression=Attr(list(pk.keys())[0]).exists(),
             )
+        except self._ddb_client.meta.client.exceptions.ConditionalCheckFailedException as e:
+            logger.error(
+                f'Item with {pk=}in table {self.ddb_table_name} not found when trying to update with {attributes=}.'
+            )
+            raise ItemNotFound(pk, self.ddb_table_name) from e
         except self._ddb_client.meta.client.exceptions.ClientError as e:
-            if e.response['Error']['Code'] == 'ResourceNotFoundException':
-                # TODO: this is incorrectly catching the exception when the item does not exist.
-                logger.error(f'Item with {pk=} not found.')
-                raise DatabaseException(f'Item with {pk=} not found.') from e
-            else:
-                logger.error(f'Failed to update item with {pk=}. Error: {e}')
-                raise DatabaseException(f'Failed to update item with {pk=} and {attributes=}.') from e
+            logger.error(f'Failed to update item with {pk=}. Error: {e}')
+            raise DatabaseException(f'Failed to update item with {pk=} and {attributes=}.') from e
         except BotoCoreError as e:
             logger.error(f'Failed 2 to update item with {pk=}. Error: {e}')
             raise DatabaseException(f'Failed to update item with {pk=} and {attributes=}.') from e
