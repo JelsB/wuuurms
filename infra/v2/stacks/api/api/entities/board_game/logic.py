@@ -1,11 +1,17 @@
 import uuid
-from typing import Literal, TypedDict
+from typing import Dict, Literal, TypedDict
 
 from boto3.dynamodb.conditions import Key
 from mypy_boto3_dynamodb.type_defs import QueryInputTableQueryTypeDef
 
 from api.data_access.ddb_client import DdbClient
-from api.entities.board_game.models import BoardGameInDdb, BoardGameInput, BoardGameOutput, GetBoardGameOutput
+from api.entities.board_game.models import (
+    BoardGameInDdb,
+    BoardGameInput,
+    BoardGameOutput,
+    GetBoardGameOutput,
+    UpdateBoardGameInput,
+)
 from api.exceptions import ItemNotFound
 from api.settings import table_name
 
@@ -16,7 +22,6 @@ def create_new_board_game(board_game: BoardGameInput):
         **board_game.model_dump(), GSI1PK=f'state#{board_game.state}', GSI1SK=f'name#{board_game.name}'
     )
     ddb_client.put_item(board_game_db.model_dump())
-    print(board_game_db.model_dump())
     board_game_out = BoardGameOutput(id=uuid.UUID(board_game_db.pk, version=4), name=board_game_db.name)
     return board_game_out
 
@@ -24,7 +29,7 @@ def create_new_board_game(board_game: BoardGameInput):
 def get_board_game(id: str):
     ddb_client = DdbClient(table_name().board_game)
     board_game_from_db = ddb_client.get_item_from_pk({'pk': id})
-    board_game_out = GetBoardGameOutput(**board_game_from_db)
+    board_game_out = GetBoardGameOutput(**board_game_from_db, id=board_game_from_db['pk'])
     return board_game_out
 
 
@@ -70,3 +75,19 @@ def get_board_games_by_name(
 def delete_board_game(id: str):
     ddb_client = DdbClient(table_name().board_game)
     ddb_client.delete_item({'pk': id})
+
+
+def update_board_game(id: str, board_game: UpdateBoardGameInput):
+    ddb_client = DdbClient(table_name().board_game)
+    gsi_fields: Dict[Literal['GSI1PK', 'GSI1SK'], str] = {}
+    # Only update GSI fields if their dependent values are updated
+    if board_game.state:
+        gsi_fields['GSI1PK'] = f'state#{board_game.state}'
+    if board_game.name:
+        gsi_fields['GSI1SK'] = f'name#{board_game.name}'
+
+    attributes_to_update = {**board_game.model_dump(exclude_none=True), **gsi_fields}
+    try:
+        ddb_client.update_item({'pk': id}, attributes_to_update)
+    except ItemNotFound:
+        raise ItemNotFound({'pk': id}, table_name().board_game)

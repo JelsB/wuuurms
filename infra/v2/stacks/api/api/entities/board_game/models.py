@@ -1,8 +1,10 @@
 from decimal import Decimal
 from enum import StrEnum
-from typing import Literal
+from typing import Literal, Optional
 import uuid
 from pydantic import UUID4, BaseModel, Field, PositiveInt, model_validator
+
+from api.utils.models import optional
 
 
 class BoardGameKind(StrEnum):
@@ -52,6 +54,11 @@ class BoardGameBase(BaseModel):
     )
 
 
+@optional
+class BoardGameOptionalBase(BoardGameBase):
+    pass
+
+
 class BoardGameInput(BoardGameBase):
     pass
 
@@ -65,6 +72,11 @@ class BoardGameInDdb(BoardGameBase):
     pk: str = Field(default_factory=lambda: str(uuid.uuid4()))
     GSI1PK: str
     GSI1SK: str
+
+
+class BoardGameOptionalInDdb(BoardGameOptionalBase):
+    GSI1PK: Optional[str]
+    GSI1SK: Optional[str]
 
 
 class ListFilterParams(BaseModel):
@@ -93,3 +105,11 @@ class ListFilterParams(BaseModel):
 
 class GetBoardGameOutput(BoardGameBase):
     id: UUID4 = ID
+
+
+class UpdateBoardGameInput(BoardGameOptionalBase):
+    pass
+
+
+class OptionalBoardGameInDdb(BoardGameBase):
+    pass
