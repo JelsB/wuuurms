@@ -93,6 +93,7 @@ class ListFilterParams(BaseModel):
         'alphabetically',
         description='How to order the board games based on their name. Descending means alphabetically and',
     )
+    # TODO: add support for filtering by state (default active, options: active, inactive, all)
 
     @model_validator(mode='after')
     def check_start_id_and_start_name(cls, values):
