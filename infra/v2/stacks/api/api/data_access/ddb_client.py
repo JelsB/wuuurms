@@ -1,12 +1,10 @@
-from math import log
-from typing import Any, List, Unpack, cast
+from typing import Any, List, Optional, cast
 
-import boto3
-from boto3.dynamodb.conditions import Attr
+from boto3 import resource
+from boto3.dynamodb.conditions import Attr, AttributeExists
 from botocore.exceptions import BotoCoreError
 from mypy_boto3_dynamodb import DynamoDBServiceResource
 from mypy_boto3_dynamodb.service_resource import Table
-from mypy_boto3_dynamodb.type_defs import QueryInputTableQueryTypeDef
 
 from api.observability import logger
 from api.exceptions import DatabaseException, ItemNotFound
@@ -21,7 +19,7 @@ class DdbClient:
 
     def _create_ddb_table_client(self) -> tuple[DynamoDBServiceResource, Table]:
         try:
-            ddb_resource_client = cast(DynamoDBServiceResource, boto3.resource('dynamodb'))
+            ddb_resource_client = cast(DynamoDBServiceResource, resource('dynamodb'))
             return ddb_resource_client, ddb_resource_client.Table(self.ddb_table_name)
         # TODO: catch specific exceptions
         except Exception as e:
@@ -89,15 +87,18 @@ class DdbClient:
         Raises:
             DatabaseException: Some issue with the database operation.
         """
-        # key_condition_expression = None
-        # for key, value in gsi_keys.items():
-        #     key_condition_expression = (
-        #         Key(key).eq(value)
-        #         if key_condition_expression is None
-        #         else key_condition_expression & Key(key).eq(value)
-        #     )
-        # # typeguard
-        # assert key_condition_expression is not None
+        # Check if all the primary keys exist.
+        # This supports composite primary keys (sort keys) out of the box
+        pks_exist: Optional[AttributeExists] = None
+        for pk_name in pk.keys():
+            if not pks_exist:
+                pks_exist = Attr(pk_name).exists()
+            else:
+                # TODO: will need to be validated with tables that use a composite key
+                pks_exist = pks_exist and Attr(pk_name).exists()
+        # typeguard
+        assert pks_exist is not None
+
         try:
             # TODO: condition to check if it also exists? API call will silently be successful even if it doesn't exist.
             self._ddb_table_client.update_item(
@@ -107,12 +108,11 @@ class DdbClient:
                 UpdateExpression='SET ' + ', '.join([f'#{key} = :val_{key}' for key in attributes.keys()]),
                 ExpressionAttributeNames={f'#{key}': key for key in attributes.keys()},
                 ExpressionAttributeValues={f':val_{key}': value for key, value in attributes.items()},
-                # NOTE: not accepting a dict for the PK will make this simpler
-                ConditionExpression=Attr(list(pk.keys())[0]).exists(),
+                ConditionExpression=pks_exist,
             )
         except self._ddb_client.meta.client.exceptions.ConditionalCheckFailedException as e:
             logger.error(
-                f'Item with {pk=}in table {self.ddb_table_name} not found when trying to update with {attributes=}.'
+                f'Item with {pk=} in table {self.ddb_table_name} not found when trying to update with {attributes=}.'
             )
             raise ItemNotFound(pk, self.ddb_table_name) from e
         except self._ddb_client.meta.client.exceptions.ClientError as e:
