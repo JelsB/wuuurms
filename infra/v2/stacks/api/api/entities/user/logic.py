@@ -1,5 +1,5 @@
 from api.data_access.ddb_client import DdbClient
-from api.entities.user.models import GetUserOutput, UserInDdb, CreateUserInput, CreateUserOutput
+from api.entities.user.models import GetUserOutput, GetUsersOutput, UserInDdb, CreateUserInput, CreateUserOutput
 from api.settings import table_name
 
 
@@ -19,10 +19,15 @@ def get_user(username: str):
     return user_out
 
 
-def get_users(limit: int, start_username: str = None):
+def get_users(limit: int, start_username: str = None) -> GetUsersOutput:
     ddb_client = DdbClient(table_name().user)
     last_evaluated_key = {'pk': start_username} if start_username else None
     users_from_db = ddb_client.scan_table(limit, last_evaluated_key)
 
     users_out = [GetUserOutput(**user, username=user['pk']) for user in users_from_db['items']]
-    return users_out
+
+    # explicit check because it's NotRequired and this is the most type safe way to do so.
+    if 'last_evaluated_key' in users_from_db:
+        last_evaluated_username = users_from_db['last_evaluated_key']
+
+    return GetUsersOutput(users=users_out, last_evaluated_username=last_evaluated_username['pk'])

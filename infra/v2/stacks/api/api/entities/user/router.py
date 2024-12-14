@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, Path, Query, status
 
 from api.common_router.responses import HTTP_RESPONSES
 import api.entities.user.logic as logic
-from api.entities.user.models import CreateUserInput, CreateUserOutput, GetUserOutput, ListFilterParams
+from api.entities.user.models import CreateUserInput, CreateUserOutput, GetUserOutput, GetUsersOutput, ListFilterParams
 from api.exceptions import DatabaseException, ItemNotFound
 
 router = APIRouter(prefix='/users', tags=['users'], responses=HTTP_RESPONSES[status.HTTP_500_INTERNAL_SERVER_ERROR])
@@ -28,7 +28,7 @@ def get_user(username: Annotated[str, Path(title='Username of the User')]) -> Ge
 
 
 @router.get('/')
-def get_users(query_params: Annotated[ListFilterParams, Query()]):
+def get_users(query_params: Annotated[ListFilterParams, Query()]) -> GetUsersOutput:
     try:
         return logic.get_users(limit=query_params.limit, start_username=query_params.start_username)
     except DatabaseException:

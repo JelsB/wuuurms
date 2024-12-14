@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, Field
 
 UserName = Field(min_length=1, max_length=30, description='Username of the player')
@@ -23,6 +24,17 @@ class UserInDdb(UserBase):
 
 class GetUserOutput(UserBase):
     username: str = UserName
+
+
+class GetUsersOutput(BaseModel):
+    users: list[GetUserOutput]
+    last_evaluated_username: str | None = Field(
+        default=None,
+        description=(
+            'The username of the last user returned. '
+            + 'Supply this as the start_username in the next request to get the next page of users.'
+        ),
+    )
 
 
 class ListFilterParams(BaseModel):
