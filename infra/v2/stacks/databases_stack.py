@@ -1,22 +1,14 @@
 from typing import TypedDict
 from aws_cdk import Stack
-from aws_cdk.aws_dynamodb import (
-    Attribute,
-    AttributeType,
-    Billing,
-    Capacity,
-    GlobalSecondaryIndexPropsV2,
-    ITableV2,
-    TableV2,
-)
+from aws_cdk.aws_dynamodb import Attribute, AttributeType, BillingMode, ITable, Table
 from constructs import Construct
 
 
 class Tables(TypedDict):
-    board_game_table: ITableV2
-    player_table: ITableV2
-    team_table: ITableV2
-    user_table: ITableV2
+    board_game_table: ITable
+    player_table: ITable
+    team_table: ITable
+    user_table: ITable
 
 
 class DatabasesStack(Stack):
@@ -34,55 +26,61 @@ class DatabasesStack(Stack):
             'user_table': user_table,
         }
 
+    # Not using TableV2 because it required autoscaling of write capacity
+    # autoscaling creates CW alarms which cost money.
+    # Switch to on-demand after we reach more than 25 RCU or 25 WCU (=free tier)
+
     def create_board_game_table(self):
-        return TableV2(
+        table = Table(
             self,
-            'BoardGame',
+            'BoardGame2',
             table_name='board-game',
-            billing=Billing.provisioned(
-                read_capacity=Capacity.fixed(1), write_capacity=Capacity.autoscaled(max_capacity=1)
-            ),
             partition_key=Attribute(name='pk', type=AttributeType.STRING),
-            global_secondary_indexes=[
-                GlobalSecondaryIndexPropsV2(
-                    index_name='GSI1',
-                    partition_key=Attribute(name='GSI1PK', type=AttributeType.STRING),
-                    sort_key=Attribute(name='GSI1SK', type=AttributeType.STRING),
-                )
-            ],
+            billing_mode=BillingMode.PROVISIONED,
+            read_capacity=1,
+            write_capacity=1,
+        )
+        table.add_global_secondary_index(
+            index_name='GSI1',
+            partition_key=Attribute(name='GSI1PK', type=AttributeType.STRING),
+            sort_key=Attribute(name='GSI1SK', type=AttributeType.STRING),
+            read_capacity=1,
+            write_capacity=1,
         )
 
+        return table
+
     def create_player_table(self):
-        return TableV2(
+        return Table(
             self,
-            'Player',
+            'Player2',
             table_name='player',
-            billing=Billing.provisioned(
-                read_capacity=Capacity.fixed(1), write_capacity=Capacity.autoscaled(max_capacity=1)
-            ),
+            billing_mode=BillingMode.PROVISIONED,
+            read_capacity=1,
+            write_capacity=1,
             partition_key=Attribute(name='pk', type=AttributeType.STRING),
             sort_key=Attribute(name='sk', type=AttributeType.STRING),
         )
 
     def create_team_table(self):
-        return TableV2(
+        return Table(
             self,
-            'Team',
+            'Team2',
             table_name='team',
-            billing=Billing.provisioned(
-                read_capacity=Capacity.fixed(1), write_capacity=Capacity.autoscaled(max_capacity=1)
-            ),
+            billing_mode=BillingMode.PROVISIONED,
+            read_capacity=1,
+            write_capacity=1,
             partition_key=Attribute(name='pk', type=AttributeType.STRING),
             sort_key=Attribute(name='sk', type=AttributeType.STRING),
         )
 
     def create_user_table(self):
-        return TableV2(
+        return Table(
             self,
-            'User',
+            'User2',
             table_name='user',
-            billing=Billing.provisioned(
-                read_capacity=Capacity.fixed(1), write_capacity=Capacity.autoscaled(max_capacity=1)
-            ),
+            billing_mode=BillingMode.PROVISIONED,
+            read_capacity=1,
+            write_capacity=1,
             partition_key=Attribute(name='pk', type=AttributeType.STRING),
         )
