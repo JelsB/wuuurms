@@ -15,5 +15,11 @@ class DatabaseException(Exception):
 
 class ItemNotFound(DatabaseException):
     def __init__(self, item_key: dict, table: str) -> None:
-        message = f'Item with {item_key} not found in table {table}'
+        message = f'Item with {item_key} not found in table {table}.'
+        super().__init__(message)
+
+
+class NoItemsNotFound(DatabaseException):
+    def __init__(self, table: str) -> None:
+        message = f'No items were found in table {table}.'
         super().__init__(message)

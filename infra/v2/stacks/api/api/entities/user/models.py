@@ -23,3 +23,8 @@ class UserInDdb(UserBase):
 
 class GetUserOutput(UserBase):
     username: str = UserName
+
+
+class ListFilterParams(BaseModel):
+    limit: int = Field(100, gt=0, le=100, description='Number of items to return')
+    start_username: str = Field(None, description='The username to start listing from')

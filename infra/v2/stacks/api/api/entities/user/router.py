@@ -1,10 +1,10 @@
 from typing import Annotated
-from fastapi import APIRouter, HTTPException, Path, status
+from fastapi import APIRouter, HTTPException, Path, Query, status
 
 from api.common_router.responses import HTTP_RESPONSES
 import api.entities.user.logic as logic
-from api.entities.user.models import CreateUserInput, CreateUserOutput, GetUserOutput
-from api.exceptions import DatabaseException, ItemNotFound
+from api.entities.user.models import CreateUserInput, CreateUserOutput, GetUserOutput, ListFilterParams
+from api.exceptions import DatabaseException, ItemNotFound, NoItemsNotFound
 
 router = APIRouter(prefix='/users', tags=['users'])
 
@@ -24,4 +24,13 @@ def get_user(username: Annotated[str, Path(title='Username of the User')]) -> Ge
     except DatabaseException:
         raise HTTPException(status_code=500, detail='Internal server error')
 
+    return out
+
+
+@router.get('/')
+def get_users(query_params: Annotated[ListFilterParams, Query()]):
+    try:
+        out = logic.get_users(limit=query_params.limit, start_username=query_params.start_username)
+    except NoItemsNotFound:
+        raise HTTPException(status_code=404, detail='No users found')
     return out

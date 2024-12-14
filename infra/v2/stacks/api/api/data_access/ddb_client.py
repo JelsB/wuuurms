@@ -1,13 +1,33 @@
-from typing import Any, List, Optional, cast
+from typing import Any, List, NotRequired, Optional, TypedDict, cast
 
 from boto3 import resource
 from boto3.dynamodb.conditions import Attr, AttributeExists
 from botocore.exceptions import BotoCoreError
 from mypy_boto3_dynamodb import DynamoDBServiceResource
 from mypy_boto3_dynamodb.service_resource import Table
+from mypy_boto3_dynamodb.type_defs import ScanInputTableScanTypeDef
 
 from api.observability import logger
-from api.exceptions import DatabaseException, ItemNotFound
+from api.exceptions import DatabaseException, ItemNotFound, NoItemsNotFound
+
+
+class ScanResult(TypedDict):
+    """
+    The result of a DynamoDB scan operation.
+    """
+
+    # TableAttributeValueTypeDef makes it harder for type checking.
+    # e.g. we know that PKs cannot be all types of TableAttributeValueTypeDef
+    # but we would have to introduce more type checks otherwise when using PKs
+    items: List[dict[str, Any]]
+    """
+    The items returned by the scan.
+    """
+
+    last_evaluated_key: NotRequired[dict[str, Any]]
+    """
+    The primary key of the item where the operation stopped, inclusive of the previous result set. 
+    """
 
 
 class DdbClient:
@@ -25,6 +45,31 @@ class DdbClient:
         except Exception as e:
             logger.error(f'Failed to connect to DynamoDB table: {self.ddb_table_name}. Error: {e}')
             raise DatabaseException(f'Failed to connect to DynamoDB table: {self.ddb_table_name}') from e
+
+    def scan_table(self, limit: int, last_evaluated_key: Optional[dict] = None) -> ScanResult:
+        try:
+            scan_kwargs: ScanInputTableScanTypeDef = {'Limit': limit}
+            if last_evaluated_key:
+                scan_kwargs['ExclusiveStartKey'] = last_evaluated_key
+
+            response = self._ddb_table_client.scan(**scan_kwargs)
+
+            if response['Count'] == 0:
+                raise NoItemsNotFound(table=self.ddb_table_name)
+
+            result: ScanResult = {'items': response['Items']}
+            # TODO: test is this is a correct check. Docs just say "if empty" but don't define what empty means.
+            # I presume None or empty dict, but maybe KeyError can occur. => use get() method?
+            if last_evaluated_key_response := response['LastEvaluatedKey']:
+                result['last_evaluated_key'] = last_evaluated_key_response
+            return result
+
+        except self._ddb_client.meta.client.exceptions.ClientError as e:
+            logger.error(f'Failed to scan table {self.ddb_table_name}. Error: {e}')
+            raise DatabaseException(f'Failed to scan table {self.ddb_table_name}.') from e
+        except BotoCoreError as e:
+            logger.error(f'Failed to scan table {self.ddb_table_name}. Error: {e}')
+            raise DatabaseException(f'Failed to scan table {self.ddb_table_name}.') from e
 
     def get_item_from_pk(self, pk: dict[str, str]) -> dict:
         try:

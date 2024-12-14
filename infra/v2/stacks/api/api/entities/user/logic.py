@@ -17,3 +17,12 @@ def get_user(username: str):
     user_from_db = ddb_client.get_item_from_pk({'pk': username})
     user_out = GetUserOutput(**user_from_db, username=user_from_db['pk'])
     return user_out
+
+
+def get_users(limit: int, start_username: str = None):
+    ddb_client = DdbClient(table_name().user)
+    last_evaluated_key = {'pk': start_username} if start_username else None
+    users_from_db = ddb_client.scan_table(limit, last_evaluated_key)
+
+    users_out = [GetUserOutput(**user, username=user['pk']) for user in users_from_db['items']]
+    return users_out
