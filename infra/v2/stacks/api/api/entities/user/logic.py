@@ -27,7 +27,10 @@ def get_users(limit: int, start_username: str = None) -> GetUsersOutput:
     users_out = [GetUserOutput(**user, username=user['pk']) for user in users_from_db['items']]
 
     # explicit check because it's NotRequired and this is the most type safe way to do so.
+    # NOTE: maybe it would be easier to have it required and return None if it's not there.
+    # because the output model requires it
+    last_evaluated_username = None
     if 'last_evaluated_key' in users_from_db:
-        last_evaluated_username = users_from_db['last_evaluated_key']
+        last_evaluated_username = users_from_db['last_evaluated_key']['pk']
 
-    return GetUsersOutput(users=users_out, last_evaluated_username=last_evaluated_username['pk'])
+    return GetUsersOutput(users=users_out, last_evaluated_username=last_evaluated_username)

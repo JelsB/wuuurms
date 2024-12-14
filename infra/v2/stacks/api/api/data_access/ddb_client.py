@@ -1,3 +1,4 @@
+from logging import log
 from typing import Any, List, NotRequired, Optional, TypedDict, cast
 
 from boto3 import resource
@@ -24,6 +25,7 @@ class ScanResult(TypedDict):
     The items returned by the scan.
     """
 
+    # NOTE: maybe it would
     last_evaluated_key: NotRequired[dict[str, Any]]
     """
     The primary key of the item where the operation stopped, inclusive of the previous result set. 
@@ -55,9 +57,10 @@ class DdbClient:
             response = self._ddb_table_client.scan(**scan_kwargs)
 
             result: ScanResult = {'items': response['Items']}
-            # TODO: test is this is a correct check. Docs just say "if empty" but don't define what empty means.
+            # Note: Docs just say "if empty" but don't define what empty means.
             # I presume None or empty dict, but maybe KeyError can occur. => use get() method?
-            if last_evaluated_key_response := response['LastEvaluatedKey']:
+            # => Empty means the key does not exist in the response.
+            if last_evaluated_key_response := response.get('LastEvaluatedKey'):
                 result['last_evaluated_key'] = last_evaluated_key_response
             return result
 
