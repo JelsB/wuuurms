@@ -8,7 +8,7 @@ from mypy_boto3_dynamodb.service_resource import Table
 from mypy_boto3_dynamodb.type_defs import ScanInputTableScanTypeDef
 
 from api.observability import logger
-from api.exceptions import DatabaseException, ItemNotFound, NoItemsNotFound
+from api.exceptions import DatabaseException, ItemNotFound
 
 
 class ScanResult(TypedDict):
@@ -53,9 +53,6 @@ class DdbClient:
                 scan_kwargs['ExclusiveStartKey'] = last_evaluated_key
 
             response = self._ddb_table_client.scan(**scan_kwargs)
-
-            if response['Count'] == 0:
-                raise NoItemsNotFound(table=self.ddb_table_name)
 
             result: ScanResult = {'items': response['Items']}
             # TODO: test is this is a correct check. Docs just say "if empty" but don't define what empty means.
