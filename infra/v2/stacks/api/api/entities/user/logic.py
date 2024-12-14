@@ -29,9 +29,8 @@ def get_users(limit: int, start_username: str = None) -> GetUsersOutput:
     # explicit check because it's NotRequired and this is the most type safe way to do so.
     # NOTE: maybe it would be easier to have it required and return None if it's not there.
     # because the output model requires it
-    optional_args = {}
+    last_evaluated_username = None
     if 'last_evaluated_key' in users_from_db:
-        optional_args['last_evaluated_username'] = users_from_db['last_evaluated_key']['pk']
-    # Do not pass default values explicitly because otherwise they will be included in the response
-    # even when response_model_exclude_unset = True is set
-    return GetUsersOutput(users=users_out, **optional_args)
+        last_evaluated_username = users_from_db['last_evaluated_key']['pk']
+
+    return GetUsersOutput(users=users_out, last_evaluated_username=last_evaluated_username)

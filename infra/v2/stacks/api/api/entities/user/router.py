@@ -27,7 +27,7 @@ def get_user(username: Annotated[str, Path(title='Username of the User')]) -> Ge
     return out
 
 
-@router.get('/', response_model_exclude_unset=True)
+@router.get('/', response_model_exclude_none=True)
 def get_users(query_params: Annotated[ListFilterParams, Query()]) -> GetUsersOutput:
     try:
         return logic.get_users(limit=query_params.limit, start_username=query_params.start_username)
